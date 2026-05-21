@@ -1235,6 +1235,47 @@ body {
   display: grid;
   grid-template-columns: 240px 1fr;
   min-height: 100vh;
+  transition: grid-template-columns .25s ease;
+}
+.app.collapsed {
+  grid-template-columns: 0 1fr;
+}
+.app.collapsed aside.nav {
+  overflow: hidden;
+  padding-left: 0;
+  padding-right: 0;
+  border-right: none;
+}
+
+/* ───── Sidebar toggle ───── */
+#sidebar-toggle {
+  position: fixed;
+  top: 14px;
+  left: 194px;
+  z-index: 1000;
+  transition: left .25s ease, background .15s ease;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#sidebar-toggle:hover { background: var(--accent); }
+#sidebar-toggle.is-collapsed { left: 12px; }
+
+/* ───── TMC Aggregator iframe ───── */
+.tmc-frame {
+  width: 100%;
+  height: calc(100vh - 92px);
+  border: none;
+  display: block;
 }
 
 /* ───── Sidebar ───── */
@@ -1310,27 +1351,6 @@ aside.nav {
   border-radius: 8px;
 }
 .nav-btn.active .count { background: rgba(0,0,0,.2); opacity: 1; }
-
-.team-block {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(247,244,237,.1);
-}
-.team-member {
-  font-size: 11px;
-  color: rgba(247,244,237,.6);
-  padding: 4px 4px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.team-member .role {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: rgba(247,244,237,.35);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
 
 .sync-block {
   margin-top: auto;
@@ -2028,6 +2048,8 @@ td.actions button.map-btn:hover { background: var(--teal); border-color: var(--t
 </head>
 <body>
 
+<button id="sidebar-toggle" aria-label="Toggle sidebar" title="Toggle sidebar">«</button>
+
 <div class="app">
 
   <!-- ────── SIDEBAR ────── -->
@@ -2046,16 +2068,8 @@ td.actions button.map-btn:hover { background: var(--teal); border-color: var(--t
     <button class="nav-btn" data-view="crash"><span>Crash Data</span><span class="count" id="count-crash">0</span></button>
     <button class="nav-btn" data-view="yss"><span>Your Speed Signs</span><span class="count" id="count-yss">0</span></button>
 
-    <div class="team-block">
-      <div class="nav-section-label">Engineering Team</div>
-      <div class="team-member"><span>Lamont Johnson</span><span class="role">Asst.</span></div>
-      <div class="team-member"><span>Chris Johnson</span><span class="role">Tech.</span></div>
-      <div class="team-member"><span>Bryant Cuffey</span><span class="role">Eng. II</span></div>
-      <div class="team-member" style="opacity:.7; margin-top:6px;"><span>Bernie Stewart</span><span class="role">Aide III</span></div>
-      <div class="team-member" style="opacity:.7;"><span>Barry Adkins</span><span class="role">Aide III</span></div>
-      <div class="team-member" style="opacity:.7;"><span>Sam Winston</span><span class="role">Aide III</span></div>
-      <div class="team-member" style="opacity:.7;"><span>Stephen Nitsch</span><span class="role">Aide III</span></div>
-    </div>
+    <div class="nav-section-label">Tools</div>
+    <button class="nav-btn" data-view="tmc"><span>TMC Aggregator</span><span style="font-size:10px; color:var(--gold);">⊕</span></button>
 
     <div class="sync-block">
       <div class="sync-status"><span class="dot"></span><span id="sync-text">IndexedDB ready</span></div>
@@ -2260,6 +2274,11 @@ td.actions button.map-btn:hover { background: var(--teal); border-color: var(--t
           <tbody id="study-tbody"></tbody>
         </table>
       </div>
+    </section>
+
+    <!-- TMC AGGREGATOR VIEW -->
+    <section id="view-tmc" class="view" style="display:none;">
+      <iframe src="TMC_Aggregator.html" class="tmc-frame" title="TMC Aggregator"></iframe>
     </section>
 
   </main>
@@ -3636,9 +3655,11 @@ function setView(view) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   document.getElementById('view-dashboard').style.display = view === 'dashboard' ? '' : 'none';
   document.getElementById('view-map').style.display = view === 'map' ? '' : 'none';
-  document.getElementById('view-list').style.display = (view !== 'dashboard' && view !== 'map') ? '' : 'none';
+  document.getElementById('view-tmc').style.display = view === 'tmc' ? '' : 'none';
+  document.getElementById('view-list').style.display = (view !== 'dashboard' && view !== 'map' && view !== 'tmc') ? '' : 'none';
 
   if (view === 'dashboard') { currentType = null; renderDashboard(); }
+  else if (view === 'tmc') { currentType = null; }
   else if (view === 'map') {
     currentType = null;
     const ok = initMap();
@@ -3697,6 +3718,13 @@ function closeAllDropdowns() {
 
 function wire() {
   document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+
+  document.getElementById('sidebar-toggle').addEventListener('click', () => {
+    const collapsed = document.querySelector('.app').classList.toggle('collapsed');
+    const btn = document.getElementById('sidebar-toggle');
+    btn.classList.toggle('is-collapsed', collapsed);
+    btn.textContent = collapsed ? '☰' : '«';
+  });
 
   document.getElementById('btn-add').addEventListener('click', () => {
     if (currentType) openAdd(currentType);

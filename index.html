@@ -1270,14 +1270,6 @@ body {
 #sidebar-toggle:hover { background: var(--accent); }
 #sidebar-toggle.is-collapsed { left: 12px; }
 
-/* ───── TMC Aggregator iframe ───── */
-.tmc-frame {
-  width: 100%;
-  height: calc(100vh - 92px);
-  border: none;
-  display: block;
-}
-
 /* ───── Sidebar ───── */
 aside.nav {
   background: var(--ink);
@@ -2044,6 +2036,345 @@ td.actions button.map-btn:hover { background: var(--teal); border-color: var(--t
   .page-head { flex-direction: column; }
   .data-tools { max-width: 100%; justify-content: flex-start; }
 }
+
+/* ============ TMC AGGREGATOR (native integration) ============ */
+#tmc-app{
+  --bg:#f7f4ed; --panel:#ffffff; --panel2:#efeae0; --line:#cfc8b8;
+  --ink:#0f1419; --mute:#6d6a5e; --accent:#b8421f; --accent-2:#c79a2a;
+  --good:#3d6b2e; --warn:#b8761f; --bad:#a02828;
+  --eb:#3057a8; --wb:#a06030; --nb:#3a8c4a; --sb:#a4506e;
+  font:13px/1.5 "SF Mono","Menlo","Consolas",monospace;
+  color:var(--ink); background:var(--bg); display:block;
+}
+#view-tmc .page-meta-sub{
+  font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--mute);
+  margin-top:6px; letter-spacing:.1em; text-transform:uppercase;
+}
+#view-tmc .page-meta-sub .accent{ color:var(--accent); }
+#view-tmc .data-btn:disabled{ opacity:.45; cursor:not-allowed; }
+#view-tmc .data-btn:disabled:hover{ background:var(--paper); color:var(--ink-soft); border-color:var(--rule); }
+#tmcTabs{
+  display:flex; flex-wrap:wrap; gap:3px;
+  border-bottom:1px solid var(--rule); margin-bottom:22px;
+}
+#tmcTabs .tmc-tab{
+  background:transparent; border:1px solid transparent; border-bottom:none;
+  color:var(--mute); font-family:'JetBrains Mono',monospace; font-size:10px;
+  text-transform:uppercase; letter-spacing:.07em; padding:9px 13px; cursor:pointer;
+  border-radius:4px 4px 0 0; transition:all .15s;
+}
+#tmcTabs .tmc-tab:hover:not(:disabled){ color:var(--ink); background:var(--paper-warm); }
+#tmcTabs .tmc-tab.active{
+  color:var(--accent); border-color:var(--rule); background:var(--paper);
+  font-weight:600; position:relative;
+}
+#tmcTabs .tmc-tab.active::after{
+  content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:var(--accent);
+}
+#tmcTabs .tmc-tab:disabled{ opacity:.4; cursor:not-allowed; }
+
+#tmc-app * {box-sizing:border-box;margin:0;padding:0}
+
+
+
+
+/* ============ SIDEBAR ============ */
+#tmc-app .sidebar {grid-area:sidebar;background:#0a0e13;border-right:1px solid var(--line);overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column}
+#tmc-app .sb-top {display:flex;align-items:center;justify-content:space-between;padding:14px 14px;border-bottom:1px solid var(--line);min-height:var(--header-h)}
+#tmc-app .sb-brand {font:700 15px/1 Georgia,serif;color:var(--accent);letter-spacing:.5px}
+#tmc-app .sb-collapsed .sb-brand {display:none}
+#tmc-app .sb-toggle {background:transparent;border:1px solid var(--line);color:var(--mute);width:26px;height:26px;cursor:pointer;border-radius:4px;font-size:14px;line-height:1;padding:0;flex-shrink:0;transition:all .15s}
+#tmc-app .sb-toggle:hover {color:var(--accent);border-color:var(--accent)}
+#tmc-app .sb-section {padding:14px 14px 4px;font-size:9px;color:var(--mute);letter-spacing:1.5px;text-transform:uppercase;font-weight:700}
+#tmc-app .sb-collapsed .sb-section {display:none}
+#tmc-app .sb-nav {padding:0 6px;display:flex;flex-direction:column;gap:1px;flex-shrink:0}
+#tmc-app .sb-nav button {width:100%;text-align:left;background:transparent;border:none;color:var(--mute);padding:8px 10px;font:500 12px Georgia,serif;cursor:pointer;border-radius:4px;transition:all .15s;display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden}
+#tmc-app .sb-nav button:hover:not(:disabled) {background:var(--panel);color:var(--ink)}
+#tmc-app .sb-nav button.active {background:var(--panel2);color:var(--accent);border-left:2px solid var(--accent);padding-left:8px}
+#tmc-app .sb-nav button:disabled {opacity:.35;cursor:not-allowed}
+#tmc-app .sb-nav .nav-icon {width:18px;display:inline-block;text-align:center;opacity:.8;flex-shrink:0}
+#tmc-app .sb-nav .nav-label {flex:1}
+#tmc-app .sb-collapsed .sb-nav .nav-label {display:none}
+#tmc-app .sb-collapsed .sb-nav button {padding:8px 0;justify-content:center}
+#tmc-app .sb-collapsed .sb-nav button.active {padding-left:0;border-left:none;border-right:2px solid var(--accent)}
+#tmc-app .sb-stats {padding:12px 14px;border-top:1px solid var(--line);margin-top:auto;font-size:10px;color:var(--mute)}
+#tmc-app .sb-stat {display:flex;justify-content:space-between;padding:3px 0}
+#tmc-app .sb-stat b {color:var(--ink);font-weight:600;font-family:Georgia,serif}
+#tmc-app .sb-collapsed .sb-stats {display:none}
+#tmc-app .sb-foot {padding:8px 14px;border-top:1px solid var(--line);font-size:9px;color:var(--mute);text-align:center;letter-spacing:.5px}
+#tmc-app .sb-collapsed .sb-foot {display:none}
+
+/* ============ HEADER ============ */
+#tmc-app .header {grid-area:header;display:flex;align-items:center;justify-content:space-between;background:#0a0e13;border-bottom:1px solid var(--line);padding:0 24px;gap:16px;position:sticky;top:0;z-index:10}
+#tmc-app .header-title {font:600 14px Georgia,serif;color:var(--ink);letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tmc-app .header-title .accent {color:var(--accent)}
+#tmc-app .header-actions {display:flex;gap:8px;align-items:center;flex-shrink:0}
+#tmc-app .btn {background:var(--panel2);color:var(--ink);border:1px solid var(--line);padding:8px 14px;font:600 11px "SF Mono",monospace;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border-radius:5px;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+#tmc-app .btn:hover:not(:disabled) {background:var(--accent);color:#f7f4ed;border-color:var(--accent)}
+#tmc-app .btn:disabled {opacity:.35;cursor:not-allowed}
+#tmc-app .btn.primary {background:var(--accent);color:#f7f4ed;border-color:var(--accent)}
+#tmc-app .btn.primary:hover:not(:disabled) {background:var(--accent-2)}
+#tmc-app .btn.ghost {background:transparent;border-color:var(--line);color:var(--mute)}
+#tmc-app .btn.ghost:hover:not(:disabled) {background:var(--panel2);color:var(--ink);border-color:var(--line)}
+
+/* ============ MAIN ============ */
+#tmc-app .main {grid-area:main;padding:20px 28px 40px;overflow-x:auto;overflow-y:auto}
+#tmc-app h2 {font:600 15px/1 Georgia,serif;color:var(--accent);margin:0 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line);letter-spacing:.3px}
+#tmc-app h3 {font:600 12px Georgia,serif;color:var(--ink);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px}
+#tmc-app .page-title {font:700 22px Georgia,serif;color:var(--accent);margin-bottom:4px;letter-spacing:.5px}
+#tmc-app .page-sub {color:var(--mute);font-size:11px;margin-bottom:20px;line-height:1.5}
+
+/* ============ DROPZONE / EMPTY ============ */
+#tmc-app #empty-state {max-width:760px;margin:24px auto;text-align:center}
+#tmc-app .dropzone {border:2px dashed var(--line);border-radius:8px;padding:48px 32px;text-align:center;background:var(--panel);transition:all .2s;cursor:pointer;margin:18px 0}
+#tmc-app .dropzone:hover, #tmc-app .dropzone.drag {border-color:var(--accent);background:var(--panel2)}
+#tmc-app .dropzone .big {font:700 16px Georgia,serif;color:var(--accent);letter-spacing:.5px;display:block;margin-bottom:6px}
+#tmc-app .dropzone p {color:var(--mute);font-size:11px;line-height:1.7}
+#tmc-app .dropzone .or {margin:14px 0;font-size:11px;color:var(--mute);letter-spacing:1px}
+#tmc-app .dropzone-btns {display:flex;gap:10px;justify-content:center;margin-top:14px}
+#tmc-app .dropzone-btns label {cursor:pointer;padding:10px 18px;background:var(--accent);color:#f7f4ed;border-radius:5px;font:600 11px 'SF Mono',monospace;letter-spacing:.6px;text-transform:uppercase;transition:background .15s;display:inline-block}
+#tmc-app .dropzone-btns label:hover {background:var(--accent-2)}
+#tmc-app .dropzone-btns label.sec {background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+#tmc-app .dropzone-btns label.sec:hover {background:var(--line);color:var(--accent)}
+#tmc-app input[type=file] {display:none}
+
+/* ============ STATUS / TOASTS ============ */
+#tmc-app .status {padding:11px 16px;background:var(--panel);border-left:3px solid var(--accent);font-size:11px;color:var(--mute);margin-bottom:18px;border-radius:0 4px 4px 0;line-height:1.55}
+#tmc-app .status.err {border-color:var(--bad);color:var(--bad)}
+#tmc-app .status.ok {border-color:var(--good);color:var(--good)}
+#tmc-app .status b {color:var(--ink);font-weight:600}
+#tmc-app .upload-progress {position:fixed;bottom:20px;right:20px;background:var(--panel);border:1px solid var(--accent);border-radius:6px;padding:14px 18px;font-size:11px;color:var(--ink);box-shadow:0 4px 16px rgba(0,0,0,.5);min-width:240px;z-index:100}
+#tmc-app .upload-progress .pct {color:var(--accent);font:700 16px Georgia,serif}
+
+/* ============ KPI GRID ============ */
+#tmc-app .grid-kpi {display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+#tmc-app .kpi {background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;text-align:center}
+#tmc-app .kpi .v {font:700 26px Georgia,serif;color:var(--accent);display:block;margin-bottom:2px;letter-spacing:.4px}
+#tmc-app .kpi .l {font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:1px}
+
+/* ============ TABLES ============ */
+#tmc-app .table-wrap {overflow-x:auto;margin-bottom:14px}
+#tmc-app table {width:100%;border-collapse:collapse;font-size:11px}
+#tmc-app th {text-align:left;padding:8px 10px;background:var(--panel2);color:var(--mute);text-transform:uppercase;letter-spacing:.5px;font-size:10px;font-weight:600;border-bottom:1px solid var(--line);white-space:nowrap}
+#tmc-app td {padding:7px 10px;border-bottom:1px solid var(--line)}
+#tmc-app tr:hover td {background:var(--panel2)}
+#tmc-app .num {text-align:right;font-variant-numeric:tabular-nums}
+#tmc-app .pill {display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;letter-spacing:.4px}
+#tmc-app .pill.eb {background:rgba(48,87,168,.13);color:var(--eb)}
+#tmc-app .pill.wb {background:rgba(160,96,48,.13);color:var(--wb)}
+#tmc-app .pill.nb {background:rgba(58,140,74,.13);color:var(--nb)}
+#tmc-app .pill.sb {background:rgba(164,80,110,.13);color:var(--sb)}
+#tmc-app .flag-high {color:var(--warn);font-weight:700}
+#tmc-app .flag-vh {color:var(--bad);font-weight:700}
+
+/* row highlight for ranked intersections */
+#tmc-app tr.is-rank-1 td {background:rgba(184,66,31,.07)}
+#tmc-app tr.is-rank-1 td:first-child::before {content:'🎯 ';font-size:12px}
+
+/* ============ BARS / CHARTS ============ */
+#tmc-app .bar-list {background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px}
+#tmc-app .bar-row {display:grid;grid-template-columns:230px 1fr 70px;gap:12px;align-items:center;padding:5px 0;font-size:11px}
+#tmc-app .bar-bg {height:14px;background:var(--panel2);border-radius:2px;overflow:hidden}
+#tmc-app .bar-fill {height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .3s}
+#tmc-app .bar-lbl {font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ============ HEATMAP ============ */
+#tmc-app .heatmap-row {margin-bottom:22px}
+#tmc-app .heatmap-block {margin:6px 0 12px}
+#tmc-app .heatmap-blabel {font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600}
+#tmc-app .heatmap-wrap {overflow-x:auto;padding-bottom:4px}
+#tmc-app .heatmap {font-size:10px;font-variant-numeric:tabular-nums;border-collapse:collapse;width:100%}
+#tmc-app .heatmap td {padding:4px 5px;text-align:center;border:1px solid var(--line);height:22px}
+#tmc-app .heatmap tr.heatmap-times td {font-size:9px;color:var(--mute);background:transparent;border-color:transparent;height:auto;padding:2px 1px;font-weight:500}
+#tmc-app .hm0 {background:#ffffff}#tmc-app .hm1 {background:#e6ebf3}#tmc-app .hm2 {background:#c0cce0}#tmc-app .hm3 {background:#8da8c8;color:#fff}
+#tmc-app .hm4 {background:#c08c50;color:#fff}#tmc-app .hm5 {background:#a06030;color:#fff}#tmc-app .hm6 {background:#702020;color:#fff}
+
+/* ============ CHARTS ============ */
+#tmc-app .chart-wrap {background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px}
+#tmc-app .chart-wrap svg {display:block;width:100%;height:auto;max-width:100%}
+#tmc-app .chart-title {font:600 12px Georgia,serif;color:var(--ink);margin-bottom:10px;letter-spacing:.3px}
+#tmc-app .chart-legend {display:flex;flex-wrap:wrap;gap:14px;font-size:10px;color:var(--mute);margin-top:8px;justify-content:center}
+#tmc-app .chart-legend span {display:flex;align-items:center;gap:5px}
+#tmc-app .chart-legend i {width:12px;height:12px;display:inline-block;border-radius:2px}
+
+/* Compass diagram (per-intersection) */
+#tmc-app .compass-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:12px 0}
+#tmc-app .compass-card {background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:14px;text-align:center}
+#tmc-app .compass-card .ctitle {font:600 11px Georgia,serif;color:var(--ink);margin-bottom:6px}
+#tmc-app .compass-card svg {width:100%;height:auto;max-width:280px;display:block;margin:0 auto}
+
+/* ============ COLLAPSIBLE SECTIONS ============ */
+#tmc-app .section {background:var(--panel);border:1px solid var(--line);border-radius:6px;margin-bottom:12px;overflow:hidden}
+#tmc-app .section-head {padding:11px 16px;display:flex;align-items:center;justify-content:space-between;user-select:none;background:var(--panel2)}
+#tmc-app .section-title {font:600 13px Georgia,serif;color:var(--accent);letter-spacing:.3px}
+#tmc-app .section-title .meta {color:var(--mute);font-size:11px;font-weight:400;font-family:"SF Mono",monospace;margin-left:8px}
+#tmc-app .section-body {padding:14px 16px}
+
+/* ============ INSIGHT BOXES ============ */
+#tmc-app .notes {background:rgba(184,66,31,.08);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 4px 4px 0;margin:10px 0;font-size:11px;color:var(--mute);line-height:1.6}
+#tmc-app .notes b {color:var(--ink)}
+#tmc-app .insight {background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--good);padding:10px 14px;border-radius:0 4px 4px 0;margin:8px 0;font-size:11px;line-height:1.6}
+#tmc-app .insight.warn {border-left-color:var(--warn)}
+#tmc-app .insight.bad {border-left-color:var(--bad)}
+#tmc-app .insight.action {border-left-color:var(--accent);background:rgba(184,66,31,.06)}
+#tmc-app .insight b {color:var(--ink)}
+
+/* ============ MOVEMENT CARDS ============ */
+#tmc-app .movement-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:12px 0}
+#tmc-app .mv-card {background:var(--panel2);border:1px solid var(--line);padding:12px;border-radius:5px;text-align:center}
+#tmc-app .mv-card .lbl {font-size:9px;color:var(--mute);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+#tmc-app .mv-card .v {font:700 20px Georgia,serif;color:var(--ink);display:block;margin:4px 0}
+#tmc-app .mv-card .sub {font-size:10px;color:var(--mute)}
+
+/* ============ VIEWS ============ */
+#tmc-app .tmc-view {display:none}
+#tmc-app .tmc-view.active {display:block}
+
+/* ============ EXECUTIVE SUMMARY (highlight panel) ============ */
+#tmc-app .exec-summary {background:linear-gradient(135deg,rgba(184,66,31,.06),rgba(184,66,31,.02));border:1px solid var(--accent);border-radius:6px;padding:16px 20px;margin-bottom:18px}
+#tmc-app .exec-summary h2 {color:var(--accent);border:none;padding:0;margin:0 0 8px;font-size:15px}
+#tmc-app .exec-summary .tagline {font-size:11px;color:var(--mute);margin-bottom:10px}
+#tmc-app .exec-summary p {font-size:12px;line-height:1.7;color:var(--ink);margin-bottom:6px}
+#tmc-app .exec-summary b.target {color:var(--accent);font-weight:700}
+
+/* ============ COLUMN MAPPING MODAL ============ */
+#tmc-app .mapping-modal {position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px}
+#tmc-app .mapping-content {background:var(--panel);border:1px solid var(--accent);border-radius:6px;max-width:1100px;width:100%;max-height:90vh;display:flex;flex-direction:column}
+#tmc-app .mapping-header {padding:18px 22px;border-bottom:1px solid var(--line);background:var(--panel2)}
+#tmc-app .mapping-title {font:600 16px Georgia,serif;color:var(--accent);letter-spacing:.3px}
+#tmc-app .mapping-sub {font-size:11px;color:var(--mute);margin-top:4px}
+#tmc-app .mapping-body {padding:18px 22px;overflow:auto;flex:1}
+#tmc-app .mapping-foot {padding:14px 22px;border-top:1px solid var(--line);background:var(--panel2);display:flex;justify-content:flex-end;gap:10px}
+#tmc-app .mapping-section-label {font:600 11px Georgia,serif;color:var(--accent);text-transform:uppercase;letter-spacing:1.2px;margin:14px 0 8px}
+#tmc-app .mapping-section-label:first-child {margin-top:0}
+#tmc-app .mapping-preview {border:1px solid var(--line);border-radius:4px;overflow:auto;max-height:260px;margin-bottom:14px;background:var(--panel2)}
+#tmc-app .mapping-preview table {width:100%;border-collapse:collapse;font-size:11px;font-variant-numeric:tabular-nums}
+#tmc-app .mapping-preview th {background:#efeae0;padding:8px 6px;text-align:left;border-bottom:1px solid var(--line);position:sticky;top:0}
+#tmc-app .mapping-preview th .col-name {font:600 11px Georgia,serif;color:var(--accent);display:block;margin-bottom:4px}
+#tmc-app .mapping-preview th select {width:100%;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:3px;padding:3px 4px;font-size:10px;font-family:inherit}
+#tmc-app .mapping-preview th select.assigned {border-color:var(--accent);background:#f0e6d2}
+#tmc-app .mapping-preview td {padding:4px 6px;border-bottom:1px solid var(--line);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+#tmc-app .mapping-preview tr:nth-child(even) td {background:rgba(0,0,0,0.03)}
+#tmc-app .mapping-status {padding:10px 12px;border-radius:4px;font-size:11px;margin-bottom:10px}
+#tmc-app .mapping-status.ok {background:#e7f0e2;color:#2f5523;border:1px solid #b9d2ac}
+#tmc-app .mapping-status.warn {background:#f5ecd6;color:#8a5a12;border:1px solid #d8c089}
+#tmc-app .mapping-status.err {background:#f4e0e0;color:#8a2020;border:1px solid #d8a9a9}
+
+/* ============ PRINT (PDF) ============ */
+@media print {
+  @page { size: letter; margin: 0.55in 0.5in; @bottom-center { content: "Page " counter(page) " of " counter(pages); font:9pt Georgia,serif; color:#666; } }
+  
+  #tmc-app .sidebar, #tmc-app .header, #tmc-app .dropzone, #tmc-app #empty-state, #tmc-app .no-print, #tmc-app .upload-progress, #tmc-app .status, #tmc-app .mapping-modal {display:none !important}
+  #tmc-app .main {padding:0 !important;overflow:visible !important}
+  #tmc-app .tmc-view {display:block !important;page-break-before:always}
+  #tmc-app .tmc-view:first-of-type {page-break-before:auto}
+  /* Hide v-input entirely in print (it's the empty state) */
+  #tmc-app #v-input {display:none !important}
+  #tmc-app .section {border:.75pt solid #888 !important;background:#fff !important;page-break-inside:avoid;margin-bottom:10pt !important;overflow:visible !important}
+  #tmc-app .section-head {padding:8pt 12pt !important;background:#f0f0f0 !important;border-bottom:.5pt solid #888 !important}
+  #tmc-app .section-title {color:#000 !important;font:700 11pt Georgia,serif !important}
+  #tmc-app .section-title .meta {color:#444 !important;font-style:italic}
+  #tmc-app .section-body {display:block !important;padding:10pt 14pt !important}
+  /* COVER PAGE — colorful, with banner + TOC */
+  #tmc-app #print-cover {display:flex !important;flex-direction:column;page-break-after:always;height:9.6in;padding:0 !important;background:#fff !important}
+  #tmc-app .pc-accent-bar {height:18pt;background:#c08c50 !important;margin:0 !important;width:100%;flex-shrink:0}
+  #tmc-app .pc-eyebrow {margin-top:24pt;text-align:center;font:700 10pt 'Helvetica',Arial,sans-serif !important;letter-spacing:2.5pt;color:#c08c50 !important;text-transform:uppercase;flex-shrink:0}
+  #tmc-app .pc-eyebrow-sub {text-align:center;font:italic 11pt Georgia,serif !important;color:#555 !important;margin-top:4pt;margin-bottom:26pt;flex-shrink:0}
+  #tmc-app .pc-title-block {text-align:center;margin-bottom:24pt;padding:0 0.5in;flex-shrink:0}
+  #tmc-app #print-cover .pc-title {font:700 28pt Georgia,serif !important;color:#1a1a1a !important;letter-spacing:0.5pt;margin-bottom:8pt;line-height:1.15}
+  #tmc-app #print-cover .pc-sub {font:italic 15pt Georgia,serif !important;color:#666 !important;margin-bottom:0;letter-spacing:0.5pt}
+  #tmc-app .pc-corridor-banner {margin:0 0.5in 22pt 0.5in;border:2pt solid #c08c50 !important;background:#fdf6ec !important;padding:14pt;text-align:center;page-break-inside:avoid;flex-shrink:0}
+  #tmc-app .pc-corridor-label {font:700 9pt Georgia,serif !important;letter-spacing:3pt;color:#c08c50 !important;text-transform:uppercase;margin-bottom:6pt}
+  #tmc-app .pc-corridor-name {font:700 24pt Georgia,serif !important;color:#1a1a1a !important;letter-spacing:0.5pt}
+  #tmc-app .pc-meta-grid {display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:14pt !important;margin:0 0.5in 26pt 0.5in;flex-shrink:0}
+  #tmc-app .pc-meta-cell {background:#fafafa !important;border:1pt solid #999 !important;border-top:3pt solid #c08c50 !important;padding:14pt 8pt;text-align:center;page-break-inside:avoid}
+  #tmc-app .pc-meta-num {font:700 28pt Georgia,serif !important;color:#1a1a1a !important;line-height:1;margin-bottom:5pt}
+  #tmc-app .pc-meta-lbl {font:700 8.5pt 'Helvetica',Arial,sans-serif !important;letter-spacing:1.8pt;color:#666 !important;text-transform:uppercase}
+  #tmc-app .pc-toc {margin:0 0.5in 0 0.5in;border-top:1pt solid #ccc !important;padding-top:14pt;flex:1 1 auto}
+  #tmc-app .pc-toc-title {font:700 11pt Georgia,serif !important;color:#c08c50 !important;letter-spacing:1.5pt;text-transform:uppercase;margin-bottom:10pt;text-align:center}
+  #tmc-app .pc-toc-row {display:grid !important;grid-template-columns:24pt 130pt 1fr !important;gap:10pt !important;padding:6pt 0;border-bottom:.5pt dotted #bbb !important;font:10pt Georgia,serif !important;color:#000 !important;page-break-inside:avoid;align-items:baseline}
+  #tmc-app .pc-toc-row:last-child {border-bottom:none !important}
+  #tmc-app .pc-toc-num {font:700 11pt Georgia,serif !important;color:#c08c50 !important;text-align:right}
+  #tmc-app .pc-toc-name {font:700 10pt Georgia,serif !important;color:#1a1a1a !important}
+  #tmc-app .pc-toc-desc {font:italic 9pt Georgia,serif !important;color:#555 !important;line-height:1.4}
+  #tmc-app .pc-foot {padding:10pt 0.5in 0 0.5in;margin-top:14pt;border-top:1pt solid #ccc !important;font:9pt Georgia,serif !important;color:#666 !important;text-align:center;flex-shrink:0}
+  #tmc-app .pc-foot .pc-sep {margin:0 8pt;color:#aaa !important}
+  #tmc-app .pc-foot b {color:#333 !important}
+  /* Important: first .tmc-view follows cover-page-break with no extra blank */
+  #tmc-app #v-overview {page-break-before:auto !important}
+  /* TYPOGRAPHY */
+  #tmc-app .page-title {color:#000 !important;font:700 20pt Georgia,serif !important;border-bottom:1.5pt solid #000;padding-bottom:5pt;margin-bottom:4pt}
+  #tmc-app .page-sub {color:#444 !important;font:italic 9.5pt Georgia,serif !important;margin-bottom:14pt}
+  #tmc-app h2 {color:#000 !important;border-bottom:1pt solid #555 !important;font:700 12.5pt Georgia,serif !important;margin-top:14pt;page-break-after:avoid}
+  #tmc-app h3 {color:#000 !important;font:700 10.5pt Georgia,serif !important;text-transform:none;letter-spacing:0}
+  /* EXEC SUMMARY */
+  #tmc-app .exec-summary {background:#fafaf0 !important;border:1pt solid #444 !important;color:#000 !important;padding:12pt 16pt !important}
+  #tmc-app .exec-summary h2 {color:#000 !important;border:none !important}
+  #tmc-app .exec-summary .tagline {color:#444 !important}
+  #tmc-app .exec-summary p {color:#000 !important}
+  #tmc-app .exec-summary b.target {color:#000 !important;text-decoration:underline}
+  /* KPI */
+  #tmc-app .grid-kpi {display:grid !important;grid-template-columns:repeat(auto-fit,minmax(140pt,1fr)) !important;gap:8pt !important}
+  #tmc-app .kpi {background:#fafafa !important;color:#000 !important;border:.75pt solid #888 !important;padding:10pt;page-break-inside:avoid}
+  #tmc-app .kpi .v {color:#000 !important;font:700 20pt Georgia,serif !important}
+  #tmc-app .kpi .l {color:#444 !important;font:9pt Georgia,serif !important;letter-spacing:.6pt}
+  /* TABLES */
+  #tmc-app .table-wrap {overflow:visible !important}
+  #tmc-app table {border:.75pt solid #555 !important;page-break-inside:auto;background:#fff !important;margin-bottom:8pt}
+  #tmc-app th {background:#e0e0e0 !important;color:#000 !important;border:.5pt solid #555 !important;font:700 9pt Georgia,serif !important;padding:4pt 6pt}
+  #tmc-app td {border:.5pt solid #999 !important;color:#000 !important;font:9.5pt Georgia,serif !important;padding:4pt 6pt;background:#fff !important}
+  #tmc-app tr {page-break-inside:avoid}
+  #tmc-app tr.is-rank-1 td {background:#fff5dc !important}
+  /* PILLS */
+  #tmc-app .pill {border:.5pt solid #444 !important;background:#fff !important;color:#000 !important;font-weight:700 !important;padding:1pt 5pt}
+  /* CHARTS — keep SVG colors, contained */
+  #tmc-app .chart-wrap {background:#fff !important;border:.75pt solid #888 !important;padding:10pt !important;page-break-inside:avoid}
+  #tmc-app .chart-wrap svg {max-width:100% !important;height:auto !important;display:block;margin:0 auto}
+  #tmc-app .chart-wrap svg text {fill:#000 !important}
+  #tmc-app .chart-wrap svg line {stroke:#bbb !important}
+  #tmc-app .chart-legend {color:#000 !important;font-size:9pt !important}
+  /* COMPASS GRID — 3 columns on print */
+  #tmc-app .compass-grid {display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:8pt !important}
+  #tmc-app .compass-card {background:#fafafa !important;border:.5pt solid #888 !important;padding:8pt !important;page-break-inside:avoid}
+  #tmc-app .compass-card .ctitle {color:#000 !important;font:700 9pt Georgia,serif !important;margin-bottom:4pt}
+  #tmc-app .compass-card svg {max-width:180pt !important;height:auto !important}
+  #tmc-app .compass-card svg text {font-family:Georgia,serif !important}
+  /* HEATMAP — split AM/PM blocks for readability in print */
+  #tmc-app .heatmap-row {page-break-inside:avoid;margin-bottom:14pt !important}
+  #tmc-app .heatmap-block {margin:4pt 0 8pt !important}
+  #tmc-app .heatmap-blabel {font:700 8.5pt Georgia,serif !important;color:#666 !important;letter-spacing:1pt;text-transform:uppercase;margin-bottom:3pt}
+  #tmc-app .heatmap-wrap {overflow:visible !important}
+  #tmc-app .heatmap {width:100% !important;table-layout:fixed;border-collapse:collapse !important}
+  #tmc-app .heatmap td {border:.4pt solid #999 !important;font-size:7.5pt !important;padding:3pt 1pt !important;height:auto !important;text-align:center}
+  #tmc-app .heatmap tr.heatmap-times td {font-size:7pt !important;color:#444 !important;background:#fff !important;border:none !important;padding:2pt 1pt !important;font-weight:600}
+  #tmc-app .hm0 {background:#fff !important}#tmc-app .hm1 {background:#e6ebf3 !important}#tmc-app .hm2 {background:#c0cce0 !important}
+  #tmc-app .hm3 {background:#8da8c8 !important;color:#fff !important}#tmc-app .hm4 {background:#c08c50 !important;color:#fff !important}
+  #tmc-app .hm5 {background:#a06030 !important;color:#fff !important}#tmc-app .hm6 {background:#702020 !important;color:#fff !important}
+  /* INSIGHTS */
+  #tmc-app .notes {background:#fef9ec !important;border-left:3pt solid #555 !important;color:#000 !important;font:10pt Georgia,serif !important;padding:8pt 12pt;page-break-inside:avoid}
+  #tmc-app .notes b {color:#000 !important}
+  #tmc-app .insight {background:#fafafa !important;border:.5pt solid #ccc !important;border-left:3pt solid #555 !important;color:#000 !important;font:10pt Georgia,serif !important;padding:8pt 12pt;page-break-inside:avoid}
+  #tmc-app .insight.warn {border-left-color:#a06030 !important;background:#fdf3e8 !important}
+  #tmc-app .insight.bad {border-left-color:#902020 !important;background:#fce8e8 !important}
+  #tmc-app .insight.action {border-left-color:#000 !important;background:#fff5dc !important;border-width:1pt !important}
+  #tmc-app .insight b {color:#000 !important}
+  /* MOVEMENT CARDS */
+  #tmc-app .movement-grid {grid-template-columns:repeat(4,1fr) !important;gap:6pt !important}
+  #tmc-app .mv-card {background:#fafafa !important;border:.5pt solid #888 !important;padding:6pt !important;page-break-inside:avoid}
+  #tmc-app .mv-card .v {color:#000 !important;font:700 14pt Georgia,serif !important}
+  #tmc-app .mv-card .lbl, #tmc-app .mv-card .sub {color:#444 !important;font:8.5pt Georgia,serif !important}
+  #tmc-app .flag-high, #tmc-app .flag-vh {color:#000 !important;font-weight:700 !important}
+  #tmc-app .flag-vh {text-decoration:underline}
+}
+#tmc-app #print-cover {display:none}
+
+@media print{
+  #sidebar-toggle, #view-tmc .page-head, #view-tmc .tmc-tabs{ display:none !important; }
+  #tmc-app{
+    background:#fff !important; color:#000 !important;
+    font:10.5pt/1.45 Georgia,'Times New Roman',serif !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -2059,7 +2390,7 @@ td.actions button.map-btn:hover { background: var(--teal); border-color: var(--t
 
     <div class="nav-section-label">Studies</div>
     <button class="nav-btn active" data-view="dashboard"><span>Dashboard</span></button>
-    <button class="nav-btn" data-view="map"><span>Map View</span><span style="font-size:10px; color:var(--gold);">⊕</span></button>
+    <button class="nav-btn" data-view="map"><span>Map View</span></button>
     <button class="nav-btn" data-view="calming"><span>Traffic Calming</span><span class="count" id="count-calming">0</span></button>
     <button class="nav-btn" data-view="speed"><span>Speed Studies</span><span class="count" id="count-speed">0</span></button>
     <button class="nav-btn" data-view="sight"><span>Sight Distance</span><span class="count" id="count-sight">0</span></button>
@@ -2069,7 +2400,7 @@ td.actions button.map-btn:hover { background: var(--teal); border-color: var(--t
     <button class="nav-btn" data-view="yss"><span>Your Speed Signs</span><span class="count" id="count-yss">0</span></button>
 
     <div class="nav-section-label">Tools</div>
-    <button class="nav-btn" data-view="tmc"><span>TMC Aggregator</span><span style="font-size:10px; color:var(--gold);">⊕</span></button>
+    <button class="nav-btn" data-view="tmc"><span>TMC Aggregator</span></button>
 
     <div class="sync-block">
       <div class="sync-status"><span class="dot"></span><span id="sync-text">IndexedDB ready</span></div>
@@ -2278,7 +2609,118 @@ td.actions button.map-btn:hover { background: var(--teal); border-color: var(--t
 
     <!-- TMC AGGREGATOR VIEW -->
     <section id="view-tmc" class="view" style="display:none;">
-      <iframe src="TMC_Aggregator.html" class="tmc-frame" title="TMC Aggregator"></iframe>
+      <div class="page-head">
+        <div>
+          <div class="page-title">TMC <em>Aggregator</em></div>
+          <div class="page-meta-sub" id="headerTitle">Corridor turning movement count review</div>
+        </div>
+        <div class="data-tools">
+          <div class="group-label">Data · Export</div>
+          <button class="data-btn primary" id="dlPdf" disabled>⎙ PDF Report</button>
+          <button class="data-btn" id="dlAm" disabled>↓ AM Peak CSV</button>
+          <button class="data-btn" id="dlMid" disabled>↓ Midday CSV</button>
+          <button class="data-btn" id="dlPm" disabled>↓ PM Peak CSV</button>
+          <button class="data-btn" id="dlRaw" disabled>↓ Raw CSV</button>
+          <button class="data-btn danger" id="clr" disabled>⌫ Clear</button>
+        </div>
+      </div>
+      <div id="tmc-app">
+        <div class="tmc-tabs" id="tmcTabs">
+          <button class="tmc-tab active" data-view="input">📁 Load Files</button>
+          <button class="tmc-tab" data-view="overview" disabled>▤ Corridor Overview</button>
+          <button class="tmc-tab" data-view="intersections" disabled>◆ Intersection Detail</button>
+          <button class="tmc-tab" data-view="movements" disabled>↗ Movement Ranking</button>
+          <button class="tmc-tab" data-view="heatmap" disabled>▦ Time-of-Day</button>
+          <button class="tmc-tab" data-view="insights" disabled>◉ Engineering Insights</button>
+          <button class="tmc-tab" data-view="qc" disabled>✓ QC &amp; Verification</button>
+        </div>
+  <div id="print-cover">
+    <div class="pc-accent-bar"></div>
+    <div class="pc-eyebrow">DEPARTMENT OF PUBLIC WORKS</div>
+    <div class="pc-eyebrow-sub">Traffic Engineering Division</div>
+
+    <div class="pc-title-block">
+      <div class="pc-title">Turning Movement Count Review</div>
+      <div class="pc-sub">Corridor Analysis Report</div>
+    </div>
+
+    <div class="pc-corridor-banner">
+      <div class="pc-corridor-label">CORRIDOR</div>
+      <div class="pc-corridor-name" id="pcCorridorBig">—</div>
+    </div>
+
+    <div class="pc-meta-grid">
+      <div class="pc-meta-cell"><div class="pc-meta-num" id="pcFiles">0</div><div class="pc-meta-lbl">COUNT FILES</div></div>
+      <div class="pc-meta-cell"><div class="pc-meta-num" id="pcInts">0</div><div class="pc-meta-lbl">INTERSECTIONS</div></div>
+      <div class="pc-meta-cell"><div class="pc-meta-num" id="pcDays">0</div><div class="pc-meta-lbl">COUNT DAYS</div></div>
+    </div>
+
+    <div class="pc-toc">
+      <div class="pc-toc-title">Contents</div>
+      <div class="pc-toc-row"><span class="pc-toc-num">1</span><span class="pc-toc-name">Corridor Overview</span><span class="pc-toc-desc">Executive summary · AM, Midday, PM peak hour tables and stacked-volume charts</span></div>
+      <div class="pc-toc-row"><span class="pc-toc-num">2</span><span class="pc-toc-name">Intersection Detail</span><span class="pc-toc-desc">Per-intersection compass diagrams · approach breakdowns · day-by-day variation</span></div>
+      <div class="pc-toc-row"><span class="pc-toc-num">3</span><span class="pc-toc-name">Movement Ranking</span><span class="pc-toc-desc">All 47 individual turning movements ranked by PM peak volume</span></div>
+      <div class="pc-toc-row"><span class="pc-toc-num">4</span><span class="pc-toc-name">Time-of-Day Heatmap</span><span class="pc-toc-desc">15-minute volume heatmap to confirm peak hours and shoulder periods</span></div>
+      <div class="pc-toc-row"><span class="pc-toc-num">5</span><span class="pc-toc-name">Engineering Insights</span><span class="pc-toc-desc">Priority decisions · volume observations · countermeasure suitability</span></div>
+      <div class="pc-toc-row"><span class="pc-toc-num">6</span><span class="pc-toc-name">QC &amp; Verification</span><span class="pc-toc-desc">Independent parser accuracy check vs. published peak hour values</span></div>
+    </div>
+
+    <div class="pc-foot">
+      <span><b>Generated:</b> <span id="pcDate"></span></span>
+      <span class="pc-sep">·</span>
+      <span>TMC Aggregator v2.5</span>
+      <span class="pc-sep">·</span>
+      <span>Local browser processing · no upload</span>
+    </div>
+  </div>
+  <div class="tmc-view active" id="v-input">
+    <div id="empty-state">
+      <div class="page-title">TMC Aggregator</div>
+      <div class="page-sub">Quality Counts turning movement count review · runs in your browser · no upload required</div>
+      <div class="dropzone" id="dz">
+        <span class="big">DROP YOUR CORRIDOR FOLDER HERE</span>
+        <p>One folder, one drop — every .csv across every subfolder gets loaded.<br>
+        Videos, images, and Word documents are automatically ignored.</p>
+        <div class="or">— or —</div>
+        <div class="dropzone-btns">
+          <label for="fdir">📁 Pick Corridor Folder</label>
+          <input type="file" id="fdir" webkitdirectory directory multiple>
+          <label for="fi" class="sec">+ CSV Files</label>
+          <input type="file" id="fi" multiple accept=".csv">
+        </div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 18px;margin-top:14px;text-align:left;font-size:11px;color:var(--mute);line-height:1.7">
+        <b style="color:var(--accent);font-family:Georgia,serif">How it works</b><br>
+        Pick your corridor folder — the tool walks every subfolder, keeps only .csv files, groups multiple count days per intersection, computes averaged peak-hour movements, and verifies parser accuracy against published values.<br><br>
+        <b style="color:var(--accent)">About the browser dialog:</b> when you pick a folder, the browser will list every file inside (videos, images, etc.). Only .csv files are actually loaded — everything else is ignored. Nothing leaves your computer.
+      </div>
+    </div>
+    <div id="status" class="status" style="display:none"></div>
+  </div>
+  <div class="tmc-view" id="v-overview"></div>
+  <div class="tmc-view" id="v-intersections"></div>
+  <div class="tmc-view" id="v-movements"></div>
+  <div class="tmc-view" id="v-heatmap"></div>
+  <div class="tmc-view" id="v-insights"></div>
+  <div class="tmc-view" id="v-qc"></div>
+  <div id="mapping-modal" class="mapping-modal" style="display:none">
+    <div class="mapping-content">
+      <div class="mapping-header">
+        <div class="mapping-title">Map your CSV columns</div>
+        <div class="mapping-sub" id="mapping-sub">Custom CSV format detected. Tell the tool which column holds each piece of data.</div>
+      </div>
+      <div class="mapping-body" id="mapping-body">
+        <!-- mapping-controls and preview-table inserted dynamically -->
+      </div>
+      <div class="mapping-foot">
+        <button class="btn" id="mappingCancel">Cancel</button>
+        <button class="btn primary" id="mappingApply">Apply Mapping &amp; Load All Files</button>
+      </div>
+    </div>
+  </div>
+
+<div id="uprog" class="upload-progress" style="display:none"></div>
+      </div>
     </section>
 
   </main>
@@ -3828,6 +4270,1538 @@ window.confirmDelete = confirmDelete;
 window.deleteComment = deleteComment;
 window.showOnMap = showOnMap;
 window.map = map;
+</script>
+<script>
+(function(){
+'use strict';
+const APP = document.getElementById('tmc-app');
+
+// =========================================================================
+// STATE
+// =========================================================================
+let FILES = [];
+let INTERSECTIONS = {};
+let CURRENT_VIEW = 'input';
+let CORRIDOR_NAME = '';
+let UPLOAD_TOTAL = 0, UPLOAD_DONE = 0;
+let LAST_LOAD = { total:0, csv:0, ignored:0, breakdown:{} };
+
+// =========================================================================
+// CSV PARSING — locked, verified at 100% accuracy
+// =========================================================================
+function parseCSVText(text){
+  text = text.replace(/^\uFEFF/, '');
+  const rows = [];
+  let cur = [], field = '', inQ = false;
+  for (let i=0; i<text.length; i++){
+    const c = text[i];
+    if (inQ){
+      if (c === '"' && text[i+1] === '"'){ field += '"'; i++; }
+      else if (c === '"'){ inQ = false; }
+      else field += c;
+    } else {
+      if (c === '"'){ inQ = true; }
+      else if (c === ','){ cur.push(field); field=''; }
+      else if (c === '\n' || c === '\r'){
+        if (c === '\r' && text[i+1] === '\n') i++;
+        cur.push(field); rows.push(cur); cur = []; field = '';
+      } else field += c;
+    }
+  }
+  if (field.length || cur.length){ cur.push(field); rows.push(cur); }
+  return rows;
+}
+function toInt(v){ const n=parseInt(v,10); return isNaN(n)?0:n; }
+function toFloat(v){ const n=parseFloat(v); return isNaN(n)?null:n; }
+
+// Standard 12-movement column names used internally everywhere
+const STD_MOVEMENT_KEYS = ['NB Left','NB Thru','NB Right','SB Left','SB Thru','SB Right',
+                           'EB Left','EB Thru','EB Right','WB Left','WB Thru','WB Right'];
+
+// =========================================================================
+// QC FORMAT DETECTION — returns true if this CSV looks like Quality Counts
+// =========================================================================
+function detectQCFormat(rows){
+  // Look for the signature labels in first 30 rows
+  let hasIntersection = false, hasSeriesHeader = false, hasPeakHour = false;
+  for (let i = 0; i < Math.min(60, rows.length); i++){
+    const k = (rows[i] && rows[i][0] || '').trim();
+    if (k === 'Intersection:') hasIntersection = true;
+    if (k === 'PEAK-HOUR VOLUMES') hasPeakHour = true;
+    if (k === 'ALL-VEHICLE VOLUMES') hasSeriesHeader = true;
+  }
+  return hasIntersection && hasPeakHour && hasSeriesHeader;
+}
+
+// =========================================================================
+// QC PARSER (the working, validated parser)
+// =========================================================================
+function parseTMC(filename, text, sourcePath){
+  const rows = parseCSVText(text);
+  const out = {
+    filename, source_path:sourcePath||'', qc_job:'', intersection:'', minor_street:'', major_street:'',
+    city:'', state:'', date:'', lat:null, lng:null,
+    peak_start:'', peak_end:'', peak_15_start:'', peak_15_end:'', phf:null,
+    peak_hour:{}, peak_hour_hv:{}, peds:{south:0,north:0,west:0,east:0},
+    series:[], errors:[], format:'qc'
+  };
+  for (let i=0;i<Math.min(20,rows.length);i++){
+    const r = rows[i]||[]; const k = (r[0]||'').trim();
+    if (k==='Intersection:'){ out.minor_street=(r[1]||'').trim(); out.major_street=(r[2]||'').trim(); out.intersection = `${out.minor_street} & ${out.major_street}`; }
+    else if (k==='City/State:'){ out.city=(r[1]||'').trim(); out.state=(r[2]||'').trim(); }
+    else if (k==='QCJobNo:'){ out.qc_job=(r[1]||'').trim(); }
+    else if (k==='Date:'){ out.date=(r[1]||'').trim(); }
+    else if (k==='Latitude/Longitude'){ out.lat=toFloat(r[1]); out.lng=toFloat(r[2]); }
+    else if (k==='PEAK HOUR START'){ out.peak_start=(r[1]||'').trim(); }
+    else if (k==='PEAK HOUR END'){ out.peak_end=(r[1]||'').trim(); }
+    else if (k==='PHF'){ out.phf=toFloat(r[1]); }
+  }
+  const movementCols = ['NBLeft','NBThru','NBRight','SBLeft','SBThru','SBRight',
+    'EBLeft','EBThru','EBRight','WBLeft','WBThru','WBRight',
+    'NBEntering','SBEntering','EBEntering','WBEntering',
+    'NBLeaving','SBLeaving','EBLeaving','WBLeaving'];
+  function findSection(label){
+    for (let i=0;i<rows.length;i++) if ((rows[i][0]||'').trim()===label) return i;
+    return -1;
+  }
+  const idxPH = findSection('PEAK-HOUR VOLUMES');
+  if (idxPH>=0){
+    for (let j=idxPH;j<Math.min(idxPH+5,rows.length);j++){
+      if ((rows[j]||[])[1]==='NBLeft'){
+        const dr = rows[j+1]||[];
+        movementCols.forEach((c,k)=>{ out.peak_hour[c]=toInt(dr[k+1]); });
+        break;
+      }
+    }
+  }
+  const idxHV = findSection('PERCENT HEAVY VEHICLES');
+  if (idxHV>=0){
+    for (let j=idxHV;j<Math.min(idxHV+6,rows.length);j++){
+      const r = rows[j]||[];
+      if ((r[0]||'').trim()==='HEAVY VEHICLES'){
+        movementCols.forEach((c,k)=>{ out.peak_hour_hv[c]=toFloat(r[k+1]); });
+        break;
+      }
+    }
+  }
+  const idxPed = findSection('PEAK-HOUR VOLUMES - PEDESTRIANS');
+  if (idxPed>=0){
+    const dr = rows[idxPed+2]||[];
+    out.peds = { south:toInt(dr[1]), north:toInt(dr[2]), west:toInt(dr[3]), east:toInt(dr[4]) };
+  }
+  const idxSeries = findSection('ALL-VEHICLE VOLUMES');
+  if (idxSeries>=0){
+    let headerIdx=-1;
+    for (let j=idxSeries+1;j<Math.min(idxSeries+4,rows.length);j++){
+      if ((rows[j][0]||'').trim()==='Time Period'){ headerIdx=j; break; }
+    }
+    if (headerIdx>=0){
+      const header = rows[headerIdx];
+      for (let j=headerIdx+1;j<rows.length;j++){
+        const r = rows[j]; if (!r||!r[0]) break;
+        const t = (r[0]||'').trim();
+        if (!t.match(/(AM|PM)/)) break;
+        const rec = { time:t };
+        for (let k=1;k<header.length;k++){
+          const col = (header[k]||'').trim(); if (!col) continue;
+          rec[col] = toInt(r[k]);
+        }
+        out.series.push(rec);
+      }
+    }
+  }
+  if (out.series.length===0) out.errors.push('No time series rows found');
+  if (Object.keys(out.peak_hour).length===0) out.errors.push('No peak hour data found');
+  if (!out.intersection) out.errors.push('No intersection name found');
+  return out;
+}
+
+// =========================================================================
+// GENERIC MAPPING-BASED PARSER
+// Given a column mapping (user-supplied), parse a flat CSV that has
+// one row per 15-min interval with columns: time + 12 movements
+// Mapping shape: {
+//   time_col:   'Time',  // column header name in user's CSV
+//   nb_left:    'NBL',   // ...etc for all 12 movement columns
+//   ...
+//   intersection_col: 'Intersection' (optional — falls back to filename),
+//   date_col:    'Date' (optional),
+//   lat_col, lng_col (optional)
+// }
+// =========================================================================
+function parseGenericFlat(filename, text, sourcePath, mapping){
+  const rows = parseCSVText(text);
+  const out = {
+    filename, source_path:sourcePath||'', qc_job:'', intersection:'', minor_street:'', major_street:'',
+    city:'', state:'', date:'', lat:null, lng:null,
+    peak_start:'', peak_end:'', phf:null,
+    peak_hour:{}, peak_hour_hv:{}, peds:{south:0,north:0,west:0,east:0},
+    series:[], errors:[], format:'generic'
+  };
+  if (!rows.length) { out.errors.push('Empty file'); return out; }
+
+  // First non-empty row = headers
+  let headerRowIdx = 0;
+  while (headerRowIdx < rows.length && (!rows[headerRowIdx] || !rows[headerRowIdx].some(v=>v && v.trim()))) headerRowIdx++;
+  if (headerRowIdx >= rows.length) { out.errors.push('No header row found'); return out; }
+  const headers = rows[headerRowIdx].map(h => (h||'').trim());
+
+  // Build column-index lookup from mapping
+  const colIdx = {};
+  Object.entries(mapping).forEach(([targetField, csvColName]) => {
+    if (!csvColName) return;
+    const idx = headers.indexOf(csvColName);
+    if (idx >= 0) colIdx[targetField] = idx;
+  });
+
+  if (colIdx.time_col === undefined) { out.errors.push('Time column not mapped'); return out; }
+
+  // Try to grab intersection/date/lat/lng from FIRST data row (most CSVs put these in every row)
+  const firstData = rows[headerRowIdx + 1] || [];
+  if (colIdx.intersection_col !== undefined) out.intersection = (firstData[colIdx.intersection_col] || '').trim();
+  if (!out.intersection) out.intersection = filename.replace(/\.csv$/i,'');
+  out.minor_street = out.intersection;
+  if (colIdx.date_col !== undefined) out.date = (firstData[colIdx.date_col] || '').trim();
+  if (colIdx.lat_col !== undefined) out.lat = toFloat(firstData[colIdx.lat_col]);
+  if (colIdx.lng_col !== undefined) out.lng = toFloat(firstData[colIdx.lng_col]);
+
+  // Build time series
+  const movementMap = {
+    'nb_left':'NBLeft', 'nb_thru':'NBThru', 'nb_right':'NBRight',
+    'sb_left':'SBLeft', 'sb_thru':'SBThru', 'sb_right':'SBRight',
+    'eb_left':'EBLeft', 'eb_thru':'EBThru', 'eb_right':'EBRight',
+    'wb_left':'WBLeft', 'wb_thru':'WBThru', 'wb_right':'WBRight'
+  };
+  // Display labels for time series (match QC's "NB Left" format used in window logic)
+  const seriesKeyMap = {
+    'nb_left':'NB Left', 'nb_thru':'NB Thru', 'nb_right':'NB Right',
+    'sb_left':'SB Left', 'sb_thru':'SB Thru', 'sb_right':'SB Right',
+    'eb_left':'EB Left', 'eb_thru':'EB Thru', 'eb_right':'EB Right',
+    'wb_left':'WB Left', 'wb_thru':'WB Thru', 'wb_right':'WB Right'
+  };
+
+  for (let i = headerRowIdx + 1; i < rows.length; i++){
+    const r = rows[i] || [];
+    const t = (r[colIdx.time_col] || '').trim();
+    if (!t || !t.match(/(AM|PM)/i)) continue;
+    const rec = { time: t };
+    let total = 0;
+    Object.keys(movementMap).forEach(key => {
+      if (colIdx[key] !== undefined){
+        const v = toInt(r[colIdx[key]]);
+        rec[seriesKeyMap[key]] = v;
+        total += v;
+      } else {
+        rec[seriesKeyMap[key]] = 0;
+      }
+    });
+    rec.Total = total;
+    out.series.push(rec);
+  }
+
+  // Compute peak_hour from the series (find PM peak as published peak)
+  // Window: 4 consecutive intervals max sum, anywhere
+  let bestPeak = { sum:0, idx:-1 };
+  for (let i = 0; i < out.series.length - 3; i++){
+    const s = out.series[i].Total + out.series[i+1].Total + out.series[i+2].Total + out.series[i+3].Total;
+    if (s > bestPeak.sum) bestPeak = { sum:s, idx:i };
+  }
+  if (bestPeak.idx >= 0){
+    out.peak_start = out.series[bestPeak.idx].time;
+    // Sum movements across 4 intervals for peak_hour values
+    Object.keys(movementMap).forEach(key => {
+      const stdKey = movementMap[key]; // e.g. 'NBLeft' (no space — matches existing peak_hour keys)
+      let s = 0;
+      for (let k = 0; k < 4; k++){
+        s += out.series[bestPeak.idx + k][seriesKeyMap[key]] || 0;
+      }
+      out.peak_hour[stdKey] = s;
+    });
+    // Compute Entering = L + T + R per direction
+    out.peak_hour.NBEntering = out.peak_hour.NBLeft + out.peak_hour.NBThru + out.peak_hour.NBRight;
+    out.peak_hour.SBEntering = out.peak_hour.SBLeft + out.peak_hour.SBThru + out.peak_hour.SBRight;
+    out.peak_hour.EBEntering = out.peak_hour.EBLeft + out.peak_hour.EBThru + out.peak_hour.EBRight;
+    out.peak_hour.WBEntering = out.peak_hour.WBLeft + out.peak_hour.WBThru + out.peak_hour.WBRight;
+  }
+
+  if (out.series.length === 0) out.errors.push('No time series rows found after mapping');
+  if (Object.keys(out.peak_hour).length === 0) out.errors.push('Could not compute peak hour');
+  return out;
+}
+
+// =========================================================================
+// COLUMN MAPPING UI — shown when format detection fails
+// =========================================================================
+// Target fields the user needs to map. Required vs optional.
+const MAPPING_TARGETS = [
+  { key: 'time_col',         label: 'Time Period',          required: true,  group: 'Required' },
+  { key: 'nb_left',          label: 'NB Left',              required: true,  group: 'Northbound' },
+  { key: 'nb_thru',          label: 'NB Thru',              required: true,  group: 'Northbound' },
+  { key: 'nb_right',         label: 'NB Right',             required: true,  group: 'Northbound' },
+  { key: 'sb_left',          label: 'SB Left',              required: true,  group: 'Southbound' },
+  { key: 'sb_thru',          label: 'SB Thru',              required: true,  group: 'Southbound' },
+  { key: 'sb_right',         label: 'SB Right',             required: true,  group: 'Southbound' },
+  { key: 'eb_left',          label: 'EB Left',              required: true,  group: 'Eastbound'  },
+  { key: 'eb_thru',          label: 'EB Thru',              required: true,  group: 'Eastbound'  },
+  { key: 'eb_right',         label: 'EB Right',             required: true,  group: 'Eastbound'  },
+  { key: 'wb_left',          label: 'WB Left',              required: true,  group: 'Westbound'  },
+  { key: 'wb_thru',          label: 'WB Thru',              required: true,  group: 'Westbound'  },
+  { key: 'wb_right',         label: 'WB Right',             required: true,  group: 'Westbound'  },
+  { key: 'intersection_col', label: 'Intersection name',    required: false, group: 'Optional'   },
+  { key: 'date_col',         label: 'Date',                 required: false, group: 'Optional'   },
+  { key: 'lat_col',          label: 'Latitude',             required: false, group: 'Optional'   },
+  { key: 'lng_col',          label: 'Longitude',            required: false, group: 'Optional'   }
+];
+
+// Try to auto-suggest a mapping based on column name heuristics.
+// Returns { [target_key]: csv_column_name } for matches it's confident about.
+function suggestMapping(headers){
+  const sugg = {};
+  const normalize = s => (s||'').toLowerCase().replace(/[^a-z]/g,'');
+
+  // Heuristics for each target field — matches normalized column names (letters only)
+  const heuristics = {
+    time_col:         ['time','timeperiod','interval','timestamp','period','starttime'],
+    nb_left:          ['nbleft','nbl','nlt','northboundleft','nleft','northboundl'],
+    nb_thru:          ['nbthru','nbt','nth','northboundthru','northboundthrough','nthru','northboundt'],
+    nb_right:         ['nbright','nbr','nrt','northboundright','nright','northboundr'],
+    sb_left:          ['sbleft','sbl','slt','southboundleft','sleft','southboundl'],
+    sb_thru:          ['sbthru','sbt','sth','southboundthru','southboundthrough','sthru','southboundt'],
+    sb_right:         ['sbright','sbr','srt','southboundright','sright','southboundr'],
+    eb_left:          ['ebleft','ebl','elt','eastboundleft','eleft','eastboundl'],
+    eb_thru:          ['ebthru','ebt','eth','eastboundthru','eastboundthrough','ethru','eastboundt'],
+    eb_right:         ['ebright','ebr','ert','eastboundright','eright','eastboundr'],
+    wb_left:          ['wbleft','wbl','wlt','westboundleft','wleft','westboundl'],
+    wb_thru:          ['wbthru','wbt','wth','westboundthru','westboundthrough','wthru','westboundt'],
+    wb_right:         ['wbright','wbr','wrt','westboundright','wright','westboundr'],
+    intersection_col: ['intersection','location','site','intersectionname','locationname'],
+    date_col:         ['date','countdate','dateofcount','day'],
+    lat_col:          ['lat','latitude','y'],
+    lng_col:          ['lng','lon','long','longitude','x']
+  };
+
+  headers.forEach(h => {
+    const norm = normalize(h);
+    if (!norm) return;
+    Object.entries(heuristics).forEach(([target, patterns]) => {
+      if (sugg[target]) return; // already matched
+      if (patterns.some(p => norm === p)) {
+        sugg[target] = h;
+      }
+    });
+  });
+  return sugg;
+}
+
+// Show the mapping UI. Calls onApply(mapping) when user confirms.
+function showMappingUI(filename, rows, onApply){
+  const modal = document.getElementById('mapping-modal');
+  const body = document.getElementById('mapping-body');
+  const sub = document.getElementById('mapping-sub');
+
+  // Find header row (first non-empty row)
+  let headerRowIdx = 0;
+  while (headerRowIdx < rows.length && (!rows[headerRowIdx] || !rows[headerRowIdx].some(v => v && v.trim()))) headerRowIdx++;
+  const headers = (rows[headerRowIdx] || []).map(h => (h||'').trim());
+
+  if (!headers.length){
+    body.innerHTML = `<div class="mapping-status err">Could not find any column headers in <b>${filename}</b>.</div>`;
+    modal.style.display = 'flex';
+    return;
+  }
+
+  sub.innerHTML = `Custom CSV format detected in <b>${filename}</b> — ${headers.length} columns found. Use the dropdowns above each column to assign it to a target field. <b>The same mapping will apply to all loaded files.</b>`;
+
+  // Auto-suggest mappings
+  const suggested = suggestMapping(headers);
+
+  // Build preview rows (first 8 data rows)
+  const previewRows = [];
+  for (let i = headerRowIdx + 1; i < rows.length && previewRows.length < 8; i++){
+    if (rows[i] && rows[i].some(v => v && v.trim())) previewRows.push(rows[i]);
+  }
+
+  // Build the dropdown options once (target fields user can assign)
+  let dropdownOptionsHtml = '<option value="">— ignore —</option>';
+  MAPPING_TARGETS.forEach(t => {
+    dropdownOptionsHtml += `<option value="${t.key}">${t.label}${t.required?' *':''}</option>`;
+  });
+
+  // Build the preview table with one dropdown per column header
+  let html = '<div class="mapping-section-label">CSV Preview &amp; Column Assignment</div>';
+  html += '<div id="mapping-feedback"></div>';
+  html += '<div class="mapping-preview"><table><thead><tr>';
+  headers.forEach((h, ci) => {
+    // Find if a target was auto-suggested for this column
+    let assignedTarget = '';
+    Object.entries(suggested).forEach(([target, colName]) => { if (colName === h) assignedTarget = target; });
+    html += `<th>
+      <span class="col-name">${h||'(blank)'}</span>
+      <select data-col-idx="${ci}" data-col-name="${h.replace(/"/g,'&quot;')}" class="${assignedTarget?'assigned':''}">
+        ${dropdownOptionsHtml.replace(`value="${assignedTarget}"`, `value="${assignedTarget}" selected`)}
+      </select>
+    </th>`;
+  });
+  html += '</tr></thead><tbody>';
+  previewRows.forEach(r => {
+    html += '<tr>';
+    headers.forEach((_, ci) => {
+      const val = (r[ci]||'').trim();
+      html += `<td title="${val.replace(/"/g,'&quot;')}">${val||'—'}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+
+  // Add a status legend
+  html += `<div style="font-size:10px;color:var(--mute);margin-top:4px"><b>Required fields:</b> Time Period and all 12 movement columns (NB/SB/EB/WB × Left/Thru/Right). <b>*</b> = required. The Intersection / Date / Lat / Lng fields are optional (if not provided, the filename is used as the intersection name).</div>`;
+
+  body.innerHTML = html;
+  modal.style.display = 'flex';
+
+  // Live feedback as user changes selections — highlight assigned columns and check completeness
+  const selects = body.querySelectorAll('select');
+  function refreshFeedback(){
+    const assignments = {};
+    const targetCounts = {};
+    selects.forEach(sel => {
+      const t = sel.value;
+      sel.classList.toggle('assigned', !!t);
+      if (t){
+        const colName = sel.getAttribute('data-col-name');
+        assignments[t] = colName;
+        targetCounts[t] = (targetCounts[t]||0) + 1;
+      }
+    });
+    // Check duplicates
+    const dups = Object.entries(targetCounts).filter(([,c]) => c > 1).map(([t]) => t);
+    // Check missing required
+    const missing = MAPPING_TARGETS.filter(t => t.required && !assignments[t.key]);
+    const feedback = document.getElementById('mapping-feedback');
+    if (dups.length){
+      feedback.innerHTML = `<div class="mapping-status err">⚠ Each target field can only be assigned to one column. Duplicate: <b>${dups.join(', ')}</b></div>`;
+    } else if (missing.length){
+      feedback.innerHTML = `<div class="mapping-status warn">⚠ Still need to assign: <b>${missing.map(t=>t.label).join(', ')}</b></div>`;
+    } else {
+      feedback.innerHTML = `<div class="mapping-status ok">✓ All required fields mapped. Ready to apply.</div>`;
+    }
+    return { assignments, dups, missing };
+  }
+  selects.forEach(sel => sel.addEventListener('change', refreshFeedback));
+  refreshFeedback();
+
+  // Wire up Apply and Cancel
+  document.getElementById('mappingApply').onclick = () => {
+    const { assignments, dups, missing } = refreshFeedback();
+    if (dups.length || missing.length) return; // refuse to apply
+    modal.style.display = 'none';
+    onApply(assignments);
+  };
+  document.getElementById('mappingCancel').onclick = () => {
+    modal.style.display = 'none';
+    FILES = []; // clear partial state
+    setStatus('Mapping cancelled. No files were loaded.', false);
+  };
+}
+
+// =========================================================================
+// AGGREGATION
+// =========================================================================
+function intersectionKey(f){ return (f.minor_street||'').trim().toLowerCase().replace(/\s+/g,' '); }
+
+function aggregate(){
+  INTERSECTIONS = {};
+  FILES.forEach(f => {
+    const key = intersectionKey(f);
+    if (!INTERSECTIONS[key]){
+      INTERSECTIONS[key] = { key, name:f.intersection||f.minor_street, minor:f.minor_street, major:f.major_street, lat:f.lat, lng:f.lng, files:[] };
+    }
+    INTERSECTIONS[key].files.push(f);
+    if (INTERSECTIONS[key].lat==null && f.lat!=null) INTERSECTIONS[key].lat = f.lat;
+    if (INTERSECTIONS[key].lng==null && f.lng!=null) INTERSECTIONS[key].lng = f.lng;
+  });
+  const movementCols = ['NBLeft','NBThru','NBRight','SBLeft','SBThru','SBRight','EBLeft','EBThru','EBRight','WBLeft','WBThru','WBRight','NBEntering','SBEntering','EBEntering','WBEntering','NBLeaving','SBLeaving','EBLeaving','WBLeaving'];
+  Object.values(INTERSECTIONS).forEach(intx => {
+    const days = intx.files.length;
+    const sum={};
+    movementCols.forEach(c => { sum[c]=0; });
+    intx.files.forEach(f => movementCols.forEach(c => { sum[c] += (f.peak_hour[c]||0); }));
+    const avg = {};
+    movementCols.forEach(c => { avg[c] = Math.round(sum[c]/days); });
+    intx.peak_avg = avg; intx.days=days;
+    intx.peak_total_entering = (avg.NBEntering||0)+(avg.SBEntering||0)+(avg.EBEntering||0)+(avg.WBEntering||0);
+    intx.approaches = {
+      NB:{ entering:avg.NBEntering, left:avg.NBLeft, thru:avg.NBThru, right:avg.NBRight },
+      SB:{ entering:avg.SBEntering, left:avg.SBLeft, thru:avg.SBThru, right:avg.SBRight },
+      EB:{ entering:avg.EBEntering, left:avg.EBLeft, thru:avg.EBThru, right:avg.EBRight },
+      WB:{ entering:avg.WBEntering, left:avg.WBLeft, thru:avg.WBThru, right:avg.WBRight },
+    };
+    intx.minor_lt = (avg.NBLeft||0) + (avg.SBLeft||0);
+    intx.minor_entering = (avg.NBEntering||0) + (avg.SBEntering||0);
+    intx.major_thru = (avg.EBThru||0) + (avg.WBThru||0);
+    const phfs = intx.files.map(f=>f.phf).filter(x=>x!=null);
+    intx.phf_avg = phfs.length ? phfs.reduce((a,b)=>a+b,0)/phfs.length : null;
+    intx.peak_hour_label = intx.files[0].peak_start || '';
+    // Day-to-day variability
+    if (days >= 2){
+      const totals = intx.files.map(f => (f.peak_hour.NBEntering||0)+(f.peak_hour.SBEntering||0)+(f.peak_hour.EBEntering||0)+(f.peak_hour.WBEntering||0));
+      const mean = totals.reduce((a,b)=>a+b,0)/totals.length;
+      const stdev = Math.sqrt(totals.reduce((s,v)=>s+(v-mean)**2,0)/totals.length);
+      intx.cv = mean ? stdev/mean : 0;
+      intx.totals_range = [Math.min(...totals), Math.max(...totals)];
+    } else { intx.cv = 0; intx.totals_range = null; }
+  });
+
+  const majors = {};
+  FILES.forEach(f => { if (f.major_street){ majors[f.major_street] = (majors[f.major_street]||0)+1; } });
+  let best = ['',0];
+  Object.entries(majors).forEach(([k,v]) => { if (v>best[1]) best = [k,v]; });
+  CORRIDOR_NAME = best[0] || '';
+}
+
+function rankMovements(){
+  const all = [];
+  Object.values(INTERSECTIONS).forEach(intx => {
+    ['NB','SB','EB','WB'].forEach(dir => {
+      ['Left','Thru','Right'].forEach(turn => {
+        const v = intx.peak_avg[dir+turn]||0;
+        if (v>0) all.push({ intersection:intx.name, approach:dir, movement:turn, volume:v });
+      });
+    });
+  });
+  all.sort((a,b)=>b.volume-a.volume);
+  return all;
+}
+function timeOfDayMatrix(intx){
+  const buckets = {};
+  intx.files.forEach(f => f.series.forEach(s => {
+    if (!buckets[s.time]) buckets[s.time]={count:0,total:0};
+    buckets[s.time].total += (s.Total||0); buckets[s.time].count += 1;
+  }));
+  const times = Object.keys(buckets).sort((a,b) => {
+    const parse = t => {
+      const m = t.match(/(\d+):(\d+)\s+(AM|PM)/); if (!m) return 0;
+      let h = parseInt(m[1]); const min = parseInt(m[2]); const ap = m[3];
+      if (ap==='PM' && h!==12) h+=12; if (ap==='AM' && h===12) h=0;
+      return h*60+min;
+    };
+    return parse(a)-parse(b);
+  });
+  return times.map(t => ({ time:t, avg:Math.round(buckets[t].total/buckets[t].count) }));
+}
+
+// =========================================================================
+// SVG CHART HELPERS
+// =========================================================================
+const DIR_COLORS = { NB:'#3a8c4a', SB:'#a4506e', EB:'#3057a8', WB:'#a06030' };
+const DIR_COLORS_PRINT = { NB:'#3a8c4a', SB:'#a4506e', EB:'#3057a8', WB:'#a06030' };
+const PRINT_MODE_COLORS = false; // toggled at print time for SVG charts
+
+// Stacked horizontal bar chart: shows NB/SB/EB/WB volumes per intersection
+function svgStackedApproachChart(intxList, periodLabel){
+  // Sort by total entering descending
+  const data = [...intxList].sort((a,b)=>b.peak_total_entering-a.peak_total_entering);
+  const maxTotal = Math.max(...data.map(d => d.peak_total_entering), 1);
+  const W = 720, rowH = 32, padTop = 30, padBot = 30, padL = 220, padR = 60;
+  const H = padTop + data.length*rowH + padBot;
+  const barAreaW = W - padL - padR;
+  const dirs = ['EB','WB','NB','SB']; // mainline first so it dominates visually
+  const xAxisLbl = `Volume (veh/hr)${periodLabel ? ' — ' + periodLabel : ''}`;
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="Georgia, serif">`;
+
+  // Gridlines + axis labels (volume scale)
+  const ticks = [0, 500, 1000, 1500, 2000];
+  ticks.forEach(t => {
+    if (t > maxTotal * 1.05) return;
+    const x = padL + (t/maxTotal) * barAreaW;
+    svg += `<line x1="${x}" y1="${padTop-4}" x2="${x}" y2="${H-padBot+4}" stroke="#cfc8b8" stroke-width="0.5" stroke-dasharray="2,2"/>`;
+    svg += `<text x="${x}" y="${padTop-8}" font-size="9" fill="#6d6a5e" text-anchor="middle">${t.toLocaleString()}</text>`;
+  });
+  svg += `<text x="${padL + barAreaW/2}" y="${H-padBot+22}" font-size="10" fill="#6d6a5e" text-anchor="middle">${xAxisLbl}</text>`;
+
+  // Bars
+  data.forEach((intx, i) => {
+    const y = padTop + i*rowH;
+    // Label (intersection name — truncate if needed)
+    let lbl = intx.name;
+    if (lbl.length > 30) lbl = lbl.substring(0, 28) + '…';
+    svg += `<text x="${padL-8}" y="${y+rowH/2+4}" font-size="10" fill="#0f1419" text-anchor="end">${lbl}</text>`;
+
+    // Stacked segments
+    let cursor = 0;
+    dirs.forEach(d => {
+      const v = intx.approaches[d].entering || 0;
+      if (v === 0) return;
+      const w = (v/maxTotal) * barAreaW;
+      const x = padL + cursor;
+      svg += `<rect x="${x}" y="${y+6}" width="${w}" height="${rowH-12}" fill="${DIR_COLORS[d]}" opacity="0.85"/>`;
+      // Inline number if segment wide enough
+      if (w > 32){
+        svg += `<text x="${x+w/2}" y="${y+rowH/2+4}" font-size="9" fill="#ffffff" text-anchor="middle" font-weight="600">${v}</text>`;
+      }
+      cursor += w;
+    });
+    // Total at end
+    svg += `<text x="${padL+cursor+6}" y="${y+rowH/2+4}" font-size="10" fill="#b8421f" font-weight="700">${intx.peak_total_entering.toLocaleString()}</text>`;
+  });
+
+  svg += '</svg>';
+  return svg;
+}
+
+// Horizontal bar chart for ranked movements (top N)
+function svgMovementChart(ranked, topN){
+  const data = ranked.slice(0, topN);
+  if (!data.length) return '';
+  const maxV = data[0].volume;
+  const W = 720, rowH = 22, padTop = 24, padBot = 26, padL = 280, padR = 50;
+  const H = padTop + data.length*rowH + padBot;
+  const barAreaW = W - padL - padR;
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="Georgia, serif">`;
+
+  // Gridlines
+  const step = maxV > 800 ? 200 : maxV > 400 ? 100 : 50;
+  for (let t = 0; t <= maxV*1.05; t += step){
+    const x = padL + (t/maxV) * barAreaW;
+    svg += `<line x1="${x}" y1="${padTop-4}" x2="${x}" y2="${H-padBot+4}" stroke="#cfc8b8" stroke-width="0.5" stroke-dasharray="2,2"/>`;
+    svg += `<text x="${x}" y="${padTop-8}" font-size="9" fill="#6d6a5e" text-anchor="middle">${t}</text>`;
+  }
+  svg += `<text x="${padL + barAreaW/2}" y="${H-padBot+20}" font-size="10" fill="#6d6a5e" text-anchor="middle">Volume (veh/hr)</text>`;
+
+  data.forEach((m, i) => {
+    const y = padTop + i*rowH;
+    const lbl = `${(i+1)}. ${m.intersection.length>32?m.intersection.substring(0,30)+'…':m.intersection} · ${m.approach} ${m.movement}`;
+    svg += `<text x="${padL-8}" y="${y+rowH/2+4}" font-size="9.5" fill="#0f1419" text-anchor="end">${lbl}</text>`;
+    const w = (m.volume/maxV) * barAreaW;
+    const color = m.volume > 600 ? '#a02828' : (m.volume > 300 ? '#b8761f' : DIR_COLORS[m.approach]);
+    svg += `<rect x="${padL}" y="${y+4}" width="${w}" height="${rowH-8}" fill="${color}" opacity="0.85"/>`;
+    svg += `<text x="${padL+w+5}" y="${y+rowH/2+4}" font-size="10" fill="#0f1419" font-weight="600">${m.volume}</text>`;
+  });
+
+  svg += '</svg>';
+  return svg;
+}
+
+// Compass diagram for one intersection: 4 arrows scaled to approach volume
+function svgCompass(intx){
+  // Wider SVG to ensure EB/WB labels fully fit
+  const S = 280, cx = S/2, cy = S/2;
+  const max = Math.max(intx.approaches.NB.entering, intx.approaches.SB.entering, intx.approaches.EB.entering, intx.approaches.WB.entering, 1);
+  const maxLen = 55;
+
+  let svg = `<svg viewBox="0 0 ${S} ${S}" xmlns="http://www.w3.org/2000/svg" font-family="Georgia, serif">`;
+
+  const arrows = [
+    {dir:'NB', vec:[0,-1], col:DIR_COLORS.NB, anchor:'middle'},
+    {dir:'SB', vec:[0,1],  col:DIR_COLORS.SB, anchor:'middle'},
+    {dir:'EB', vec:[1,0],  col:DIR_COLORS.EB, anchor:'start'},
+    {dir:'WB', vec:[-1,0], col:DIR_COLORS.WB, anchor:'end'},
+  ];
+
+  arrows.forEach(a => {
+    const v = intx.approaches[a.dir].entering;
+    if (v === 0){
+      const lx = cx + a.vec[0] * (maxLen + 24);
+      const ly = cy + a.vec[1] * (maxLen + 24) + (a.vec[1] === 0 ? 4 : 0);
+      svg += `<text x="${lx}" y="${ly}" font-size="10" fill="#666" text-anchor="${a.anchor}">${a.dir} 0</text>`;
+      return;
+    }
+    const len = 18 + (v/max) * maxLen;
+    const width = 4 + (v/max)*10;
+    const x1 = cx + a.vec[0]*16, y1 = cy + a.vec[1]*16;
+    const x2 = cx + a.vec[0]*len, y2 = cy + a.vec[1]*len;
+    svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${a.col}" stroke-width="${width}" stroke-linecap="round" opacity="0.85"/>`;
+    // Arrowhead
+    const ah = 8;
+    const perp = [-a.vec[1], a.vec[0]];
+    const tipX = cx + a.vec[0]*(len+ah), tipY = cy + a.vec[1]*(len+ah);
+    const baseX = cx + a.vec[0]*len, baseY = cy + a.vec[1]*len;
+    const p1x = baseX + perp[0]*ah*0.7, p1y = baseY + perp[1]*ah*0.7;
+    const p2x = baseX - perp[0]*ah*0.7, p2y = baseY - perp[1]*ah*0.7;
+    svg += `<polygon points="${tipX},${tipY} ${p1x},${p1y} ${p2x},${p2y}" fill="${a.col}" opacity="0.95"/>`;
+    // Label beyond arrowhead — has plenty of room because SVG is wider (260px) than max reach (~74px from center)
+    const labelX = cx + a.vec[0]*(len + ah + 14);
+    const labelY = cy + a.vec[1]*(len + ah + 14) + (a.vec[1] === 0 ? 4 : (a.vec[1] < 0 ? 0 : 6));
+    svg += `<text x="${labelX}" y="${labelY}" font-size="11" fill="${a.col}" text-anchor="${a.anchor}" font-weight="700">${a.dir} ${v}</text>`;
+  });
+
+  // Center circle with total (drawn on top)
+  svg += `<circle cx="${cx}" cy="${cy}" r="18" fill="#0f1419" stroke="#b8421f" stroke-width="1.5"/>`;
+  svg += `<text x="${cx}" y="${cy+4}" font-size="11" fill="#b8421f" text-anchor="middle" font-weight="700">${intx.peak_total_entering}</text>`;
+
+  svg += '</svg>';
+  return svg;
+}
+
+// =========================================================================
+// RENDERERS
+// =========================================================================
+function fmtNum(n){ return (n||0).toLocaleString(); }
+
+// Each section helper — always expanded (no collapse)
+function section(title, meta, body, open){
+  return `<div class="section open">
+    <div class="section-head">
+      <div class="section-title">${title}${meta?` <span class="meta">${meta}</span>`:''}</div>
+    </div>
+    <div class="section-body">${body}</div>
+  </div>`;
+}
+
+function renderOverview(){
+  const intxList = Object.values(INTERSECTIONS).sort((a,b)=>b.minor_lt - a.minor_lt || b.peak_total_entering - a.peak_total_entering);
+  const totalEnt = intxList.reduce((s,i)=>s+i.peak_total_entering,0);
+  const avgEnt = intxList.length ? Math.round(totalEnt/intxList.length) : 0;
+  const top1 = intxList[0], top2 = intxList[1];
+
+  let html = `<div class="page-title">Corridor Overview${CORRIDOR_NAME?' — '+CORRIDOR_NAME:''}</div>
+  <div class="page-sub">AM, Midday, and PM peak hour summaries · averaged across all count days at each intersection</div>`;
+
+  // EXECUTIVE SUMMARY — answers the "which 2 intersections" question
+  if (top1 && top2){
+    html += `<div class="exec-summary">
+      <h2>Executive Summary</h2>
+      <div class="tagline">Decision support · which intersections need detailed operational analysis</div>
+      <p>Across <b>${FILES.length}</b> count file${FILES.length===1?'':'s'} on <b>${intxList.length}</b> intersection${intxList.length===1?'':'s'}, ranked by minor-street left-turn demand (the primary driver of conflict and delay):</p>
+      <p>🎯 <b class="target">${top1.name}</b> — minor-street LT = <b>${top1.minor_lt} veh/hr</b> · total entering ${fmtNum(top1.peak_total_entering)}</p>
+      <p>🎯 <b class="target">${top2.name}</b> — minor-street LT = <b>${top2.minor_lt} veh/hr</b> · total entering ${fmtNum(top2.peak_total_entering)}</p>
+      <p style="font-size:11px;color:var(--mute);margin-top:8px">See <b>Engineering Insights</b> tab for full countermeasure recommendations.</p>
+    </div>`;
+  }
+
+  // KPI cards
+  html += `<div class="grid-kpi">
+    <div class="kpi"><span class="v">${FILES.length}</span><span class="l">CSV Files</span></div>
+    <div class="kpi"><span class="v">${intxList.length}</span><span class="l">Intersections</span></div>
+    <div class="kpi"><span class="v">${fmtNum(avgEnt)}</span><span class="l">Avg PM Peak Vol</span></div>
+    <div class="kpi"><span class="v">${CORRIDOR_NAME||'—'}</span><span class="l">Corridor</span></div>
+  </div>`;
+
+  // Period summary helper — builds the table + chart for a given peak window
+  function periodSection(windowKey, windowLabel, shortLabel){
+    // Build per-intersection data for this window
+    const periodData = [];
+    Object.values(INTERSECTIONS).forEach(intx => {
+      const s = intersectionWindowSummary(intx, windowKey);
+      if (!s) return;
+      const mv = s.avg_movements;
+      const NBe = mv['NB Left']+mv['NB Thru']+mv['NB Right'];
+      const SBe = mv['SB Left']+mv['SB Thru']+mv['SB Right'];
+      const EBe = mv['EB Left']+mv['EB Thru']+mv['EB Right'];
+      const WBe = mv['WB Left']+mv['WB Thru']+mv['WB Right'];
+      const minorLT = mv['NB Left']+mv['SB Left'];
+      // Most common peak start time (mode), for display
+      const startCounts = {};
+      s.peak_starts.forEach(t => { startCounts[t] = (startCounts[t]||0)+1; });
+      const modeStart = Object.entries(startCounts).sort((a,b)=>b[1]-a[1])[0][0];
+      periodData.push({
+        name: intx.name, days: intx.days, daysWithPeak: s.days_with_data,
+        peakStart: modeStart,
+        approaches: {
+          NB:{ entering: NBe, left: mv['NB Left'], thru: mv['NB Thru'], right: mv['NB Right'] },
+          SB:{ entering: SBe, left: mv['SB Left'], thru: mv['SB Thru'], right: mv['SB Right'] },
+          EB:{ entering: EBe, left: mv['EB Left'], thru: mv['EB Thru'], right: mv['EB Right'] },
+          WB:{ entering: WBe, left: mv['WB Left'], thru: mv['WB Thru'], right: mv['WB Right'] },
+        },
+        minor_lt: minorLT,
+        peak_total_entering: s.avg_total
+      });
+    });
+    // Sort by minor-st LT (consistent with PM display) then by total
+    periodData.sort((a,b) => b.minor_lt - a.minor_lt || b.peak_total_entering - a.peak_total_entering);
+    if (periodData.length === 0) return;
+
+    // Build table
+    let tBody = `<div class="table-wrap"><table><thead><tr><th>Intersection</th><th>Days</th><th>Peak Hour</th>`+
+      `<th class="num">NB</th><th class="num">SB</th><th class="num">EB</th><th class="num">WB</th>`+
+      `<th class="num">Minor LT</th><th class="num">Total Entering</th></tr></thead><tbody>`;
+    periodData.forEach((d, i) => {
+      const cls = i === 0 ? 'is-rank-1' : '';
+      tBody += `<tr class="${cls}"><td><strong>${d.name}</strong></td>
+        <td class="num">${d.daysWithPeak}/${d.days}</td>
+        <td>${d.peakStart}</td>
+        <td class="num">${fmtNum(d.approaches.NB.entering)}</td>
+        <td class="num">${fmtNum(d.approaches.SB.entering)}</td>
+        <td class="num">${fmtNum(d.approaches.EB.entering)}</td>
+        <td class="num">${fmtNum(d.approaches.WB.entering)}</td>
+        <td class="num"><strong>${d.minor_lt}</strong></td>
+        <td class="num"><strong>${fmtNum(d.peak_total_entering)}</strong></td></tr>`;
+    });
+    tBody += '</tbody></table></div>';
+    tBody += `<div class="notes" style="margin:8px 0 12px"><b>Sorted by minor-street left-turn demand.</b> Peak hour shown is the most common start time across count days. Days column = days with peak data found / total count days.</div>`;
+    // Add stacked chart below table
+    const chart = svgStackedApproachChart(periodData, shortLabel);
+    const legend = `<div class="chart-legend">
+      <span><i style="background:${DIR_COLORS.EB}"></i> Eastbound</span>
+      <span><i style="background:${DIR_COLORS.WB}"></i> Westbound</span>
+      <span><i style="background:${DIR_COLORS.NB}"></i> Northbound</span>
+      <span><i style="background:${DIR_COLORS.SB}"></i> Southbound</span>
+    </div>`;
+    tBody += `<div class="chart-wrap" style="margin-top:8px">${chart}${legend}</div>`;
+    html += section(`Intersection Summary — ${windowLabel}`, `${periodData.length} intersections · ${shortLabel} window`, tBody, true);
+  }
+
+  // Render AM, Midday, PM in that order (chronological)
+  periodSection('AM',     'AM Peak Hour',     '6:00–9:00 AM');
+  periodSection('Midday', 'Midday Peak Hour', '9:00 AM–3:00 PM');
+  periodSection('PM',     'PM Peak Hour',     '3:00–6:00 PM');
+
+  document.getElementById('v-overview').innerHTML = html;
+}
+
+function renderIntersections(){
+  let html = `<div class="page-title">Intersection Detail</div>
+  <div class="page-sub">Per-intersection breakdown · all approach movements · day-by-day variation · click any header to expand</div>`;
+
+  const intxList = Object.values(INTERSECTIONS).sort((a,b)=>b.minor_lt - a.minor_lt || b.peak_total_entering - a.peak_total_entering);
+
+  // Compass overview at top
+  let compassBody = '<div class="compass-grid">';
+  intxList.forEach(intx => {
+    compassBody += `<div class="compass-card">
+      <div class="ctitle">${intx.name.length>30?intx.name.substring(0,28)+'…':intx.name}</div>
+      ${svgCompass(intx)}
+      <div style="font-size:9px;color:var(--mute);margin-top:6px">Total entering · ${intx.peak_total_entering.toLocaleString()} veh/hr</div>
+    </div>`;
+  });
+  compassBody += '</div>';
+  compassBody += '<div class="notes" style="margin-top:10px"><b>Compass diagrams:</b> arrow length and thickness scale with approach volume. The center number is total entering volume. Quickly identifies dominant directions and minor-street load.</div>';
+  html += section('Intersection Compass Overview', `${intxList.length} intersections`, compassBody, true);
+
+  intxList.forEach((intx, idx) => {
+    let body = `<div style="font-size:11px;color:var(--mute);margin-bottom:8px">
+      Coords: ${intx.lat?intx.lat.toFixed(6):'—'}, ${intx.lng?intx.lng.toFixed(6):'—'} ·
+      Peak hour: ${intx.peak_hour_label||'—'} ·
+      PHF avg: ${intx.phf_avg?intx.phf_avg.toFixed(2):'—'} ·
+      Minor-street LT: <b style="color:var(--accent)">${intx.minor_lt} veh/hr</b>
+    </div>`;
+
+    body += '<div class="movement-grid">';
+    ['NB','SB','EB','WB'].forEach(dir => {
+      const a = intx.approaches[dir];
+      if (!a.entering) return;
+      body += `<div class="mv-card"><div class="lbl"><span class="pill ${dir.toLowerCase()}">${dir} Approach</span></div>
+        <span class="v">${fmtNum(a.entering)}</span>
+        <div class="sub">L: ${fmtNum(a.left)} · T: ${fmtNum(a.thru)} · R: ${fmtNum(a.right)}</div></div>`;
+    });
+    body += '</div>';
+
+    if (intx.files.length>1){
+      body += '<h3 style="margin-top:14px">Day-by-Day Variation</h3>';
+      body += '<div class="table-wrap"><table><thead><tr><th>Date</th><th>QC Job</th><th>Peak Start</th><th class="num">PHF</th>'+
+        '<th class="num">NB</th><th class="num">SB</th><th class="num">EB</th><th class="num">WB</th><th class="num">Total</th></tr></thead><tbody>';
+      // Sort by total descending
+      const sortedFiles = [...intx.files].sort((a,b)=>{
+        const ta = (a.peak_hour.NBEntering||0)+(a.peak_hour.SBEntering||0)+(a.peak_hour.EBEntering||0)+(a.peak_hour.WBEntering||0);
+        const tb = (b.peak_hour.NBEntering||0)+(b.peak_hour.SBEntering||0)+(b.peak_hour.EBEntering||0)+(b.peak_hour.WBEntering||0);
+        return tb-ta;
+      });
+      sortedFiles.forEach(f => {
+        const ph = f.peak_hour;
+        const tot = (ph.NBEntering||0)+(ph.SBEntering||0)+(ph.EBEntering||0)+(ph.WBEntering||0);
+        body += `<tr><td>${f.date}</td><td>${f.qc_job}</td><td>${f.peak_start}</td>
+          <td class="num">${f.phf?f.phf.toFixed(2):'—'}</td>
+          <td class="num">${fmtNum(ph.NBEntering)}</td>
+          <td class="num">${fmtNum(ph.SBEntering)}</td>
+          <td class="num">${fmtNum(ph.EBEntering)}</td>
+          <td class="num">${fmtNum(ph.WBEntering)}</td>
+          <td class="num"><strong>${fmtNum(tot)}</strong></td></tr>`;
+      });
+      body += '</tbody></table></div>';
+    }
+
+    const ped = intx.files[0].peds||{};
+    const totalPed = (ped.south||0)+(ped.north||0)+(ped.west||0)+(ped.east||0);
+    if (totalPed>0){
+      body += `<div class="notes" style="margin-top:10px">
+        <b>Pedestrians (peak hour):</b> South ${ped.south} · North ${ped.north} · West ${ped.west} · East ${ped.east} = <b>${totalPed}</b> total</div>`;
+    }
+
+    const meta = `${fmtNum(intx.peak_total_entering)} veh/hr · ${intx.days} day${intx.days>1?'s':''} · Minor LT ${intx.minor_lt}`;
+    // First 2 open by default to highlight top intersections
+    html += section(intx.name, meta, body, idx < 2);
+  });
+
+  document.getElementById('v-intersections').innerHTML = html;
+}
+
+function renderMovements(){
+  const ranked = rankMovements();
+  let html = `<div class="page-title">Movement Ranking</div>
+  <div class="page-sub">All individual turning movements across corridor · ranked by PM peak volume</div>`;
+
+  // Important clarification — Movement Ranking ranks single movements, not intersections
+  html += `<div class="notes" style="margin-bottom:14px"><b>How this differs from the Corridor Overview ranking:</b>
+    The Corridor Overview ranks <i>intersections</i> by minor-street left-turn demand (the conflict point that drives operational decisions).
+    This page ranks <i>individual movements</i> by raw volume across the entire corridor.
+    A single intersection like Harvie Rd may rank #1 for operational analysis (highest minor LT) yet have only the #6 mainline EB Thru volume — because Harvie's EB Thru happens to be slightly lower than other intersections.
+    Both rankings are correct; they answer different questions.</div>`;
+
+  // Summary KPIs at top
+  const heavyMovements = ranked.filter(m => m.volume > 600).length;
+  const elevated = ranked.filter(m => m.volume > 300 && m.volume <= 600).length;
+  html += `<div class="grid-kpi">
+    <div class="kpi"><span class="v">${ranked.length}</span><span class="l">Active Movements</span></div>
+    <div class="kpi"><span class="v" style="color:var(--bad)">${heavyMovements}</span><span class="l">Very High (&gt;600)</span></div>
+    <div class="kpi"><span class="v" style="color:var(--warn)">${elevated}</span><span class="l">Elevated (301-600)</span></div>
+  </div>`;
+
+  // Top-20 SVG chart
+  const top20Svg = svgMovementChart(ranked, 20);
+  const top20Legend = `<div class="chart-legend">
+    <span><i style="background:#a02828"></i> Very High (&gt;600)</span>
+    <span><i style="background:#b8761f"></i> Elevated (301-600)</span>
+    <span><i style="background:${DIR_COLORS.EB}"></i> EB</span>
+    <span><i style="background:${DIR_COLORS.WB}"></i> WB</span>
+    <span><i style="background:${DIR_COLORS.NB}"></i> NB</span>
+    <span><i style="background:${DIR_COLORS.SB}"></i> SB</span>
+  </div>`;
+  html += section('Top 20 Movements — Bar Chart', 'volume-driven decision view', `<div class="chart-wrap">${top20Svg}${top20Legend}</div>`, true);
+
+  let body = '<div class="table-wrap"><table><thead><tr><th class="num">#</th><th>Intersection</th><th>Approach</th><th>Movement</th><th class="num">Volume (veh/hr)</th></tr></thead><tbody>';
+  const max = ranked[0]?.volume||1;
+  ranked.forEach((m,i) => {
+    const pct = (m.volume/max*100).toFixed(0);
+    const flag = m.volume>600?'flag-vh':(m.volume>300?'flag-high':'');
+    body += `<tr><td class="num">${i+1}</td><td>${m.intersection}</td>
+      <td><span class="pill ${m.approach.toLowerCase()}">${m.approach}</span></td>
+      <td>${m.movement}</td>
+      <td class="num ${flag}">${fmtNum(m.volume)} <span style="color:var(--mute);font-size:9px">(${pct}%)</span></td></tr>`;
+  });
+  body += '</tbody></table></div>';
+  body += '<div class="notes" style="margin-top:14px"><b>Legend:</b> '+
+    '<span class="flag-vh">Red/underlined</span> = very high (&gt;600 veh/hr, design constraint) · '+
+    '<span class="flag-high">Orange/bold</span> = elevated (&gt;300 veh/hr, monitor capacity)</div>';
+  html += section('All Movements — Ranked', `${ranked.length} movements`, body, true);
+
+  document.getElementById('v-movements').innerHTML = html;
+}
+
+function renderHeatmap(){
+  let html = `<div class="page-title">Time-of-Day Heatmap</div>
+  <div class="page-sub">Average total entering volume · 15-minute intervals · all approaches, all days · split AM (6:00–noon) and PM (noon–6:00) for readability</div>`;
+  html += '<div class="notes">Color intensity shows volume relative to that intersection\'s daily maximum. Confirms the published peak hour visually and reveals shoulder periods that might warrant signal timing changes.</div>';
+
+  // Compact time label: 6:00 AM → "6a", 7:15 AM → "7¼a", 12:00 PM → "12p", 4:30 PM → "4½p"
+  function compactTime(t){
+    const m = t.match(/(\d+):(\d+)\s+(AM|PM)/);
+    if (!m) return t;
+    const h = m[1], mn = m[2], ap = m[3].toLowerCase()[0]; // 'a' or 'p'
+    const q = {'00':'', '15':'¼', '30':'½', '45':'¾'}[mn] || '';
+    return `${h}${q}${ap}`;
+  }
+  // Parse hour-of-day for splitting
+  function hourOf(t){
+    const m = t.match(/(\d+):(\d+)\s+(AM|PM)/);
+    if (!m) return 0;
+    let h = parseInt(m[1]); const ap = m[3];
+    if (ap === 'PM' && h !== 12) h += 12;
+    if (ap === 'AM' && h === 12) h = 0;
+    return h;
+  }
+
+  let body = '';
+  Object.values(INTERSECTIONS).sort((a,b)=>b.peak_total_entering-a.peak_total_entering).forEach(intx => {
+    const series = timeOfDayMatrix(intx);
+    if (!series.length) return;
+    const max = Math.max(...series.map(s=>s.avg));
+    function bucket(v){
+      const r = v/max;
+      if (r>0.85) return 'hm6'; if (r>0.7) return 'hm5'; if (r>0.55) return 'hm4';
+      if (r>0.4) return 'hm3'; if (r>0.25) return 'hm2'; if (r>0.1) return 'hm1';
+      return 'hm0';
+    }
+
+    // Split series into AM block (before noon) and PM block (noon onward)
+    const amBlock = series.filter(s => hourOf(s.time) < 12);
+    const pmBlock = series.filter(s => hourOf(s.time) >= 12);
+
+    function renderBlock(label, block){
+      if (!block.length) return '';
+      let out = `<div class="heatmap-block"><div class="heatmap-blabel">${label}</div>`;
+      out += '<div class="heatmap-wrap"><table class="heatmap"><tr>';
+      block.forEach(s => { out += `<td class="${bucket(s.avg)}" title="${s.time}: ${s.avg}">${s.avg}</td>`; });
+      out += '</tr><tr class="heatmap-times">';
+      block.forEach(s => { out += `<td>${compactTime(s.time)}</td>`; });
+      out += '</tr></table></div></div>';
+      return out;
+    }
+
+    body += `<div class="heatmap-row"><h3>${intx.name} <span style="color:var(--mute);font-weight:400;font-size:10px;text-transform:none;letter-spacing:0">peak: ${intx.peak_hour_label||'—'} · ${fmtNum(intx.peak_total_entering)} veh/hr</span></h3>`;
+    body += renderBlock('AM (6:00 AM – 12:00 PM)', amBlock);
+    body += renderBlock('PM (12:00 PM – 6:00 PM)', pmBlock);
+    body += '</div>';
+  });
+  html += section('Per-Intersection Heatmaps', '', body, true);
+
+  document.getElementById('v-heatmap').innerHTML = html;
+}
+
+function renderInsights(){
+  let html = `<div class="page-title">Engineering Insights</div>
+  <div class="page-sub">Decision support · heuristic observations for corridor countermeasure evaluation</div>`;
+  html += '<div class="notes">These are automated observations based on volume thresholds derived from typical traffic engineering practice. Always verify with field observations, sight distance assessments, and crash history before recommending countermeasures.</div>';
+
+  const intxList = Object.values(INTERSECTIONS).sort((a,b)=>b.minor_lt - a.minor_lt || b.peak_total_entering - a.peak_total_entering);
+
+  // PRIORITY DECISIONS — top of the page
+  let priorityBody = '';
+  if (intxList.length){
+    const top1 = intxList[0], top2 = intxList[1];
+    if (top1){
+      priorityBody += `<div class="insight action"><b>🎯 Primary candidate for detailed analysis:</b> ${top1.name}. Minor-street LT = <b>${top1.minor_lt} veh/hr</b>, total entering ${fmtNum(top1.peak_total_entering)} veh/hr at ${top1.peak_hour_label}. Recommend: HCS or Synchro operational analysis, left-turn restriction warrant evaluation, sight distance check.</div>`;
+    }
+    if (top2 && top2.minor_lt > 10){
+      priorityBody += `<div class="insight action"><b>🎯 Secondary candidate:</b> ${top2.name}. Minor-street LT = <b>${top2.minor_lt} veh/hr</b>, total entering ${fmtNum(top2.peak_total_entering)} veh/hr. Evaluate alongside primary site to test corridor-wide raised median strategy.</div>`;
+    }
+  }
+  html += section('🎯 Priority Decisions', 'top intersections for analysis', priorityBody, true);
+
+  // VOLUME-BASED FLAGS
+  let volBody = '';
+  intxList.forEach(intx => {
+    if (intx.major_thru > 1200){
+      volBody += `<div class="insight warn"><b>${intx.name}:</b> Major-street through volume = <b>${fmtNum(intx.major_thru)} veh/hr</b> (EB ${fmtNum(intx.approaches.EB.thru)} + WB ${fmtNum(intx.approaches.WB.thru)}). Mainline volume creates gap-acceptance challenges for minor-street left turns — supports left-turn restriction or raised median.</div>`;
+    }
+  });
+  intxList.forEach(intx => {
+    if (intx.minor_lt > 30){
+      volBody += `<div class="insight warn"><b>${intx.name}:</b> Minor-street LT demand = <b>${intx.minor_lt} veh/hr</b> (NB ${intx.approaches.NB.left} + SB ${intx.approaches.SB.left}). Conflict exposure grows non-linearly with mainline volume; evaluate LT restriction with U-turn provision or three-quarter access.</div>`;
+    } else if (intx.minor_lt > 10){
+      volBody += `<div class="insight"><b>${intx.name}:</b> Minor-street LT = ${intx.minor_lt} veh/hr. Moderate — restriction feasible with manageable U-turn re-routing impacts.</div>`;
+    }
+  });
+  if (!volBody) volBody = '<div class="insight">No major volume thresholds exceeded across the corridor.</div>';
+  html += section('Volume-Based Observations', '', volBody, true);
+
+  // COUNTERMEASURE SUITABILITY
+  let cmBody = '';
+  intxList.forEach(intx => {
+    if (intx.minor_entering > 0){
+      const ratio = intx.minor_entering / (intx.peak_total_entering || 1);
+      if (ratio < 0.05 && (intx.approaches.EB.entering + intx.approaches.WB.entering) > 1000){
+        cmBody += `<div class="insight"><b>${intx.name}:</b> Minor-street share = ${(ratio*100).toFixed(1)}% of total entering. Roundabout justification weak by volume alone; raised median + RIRO likely more cost-effective.</div>`;
+      }
+    }
+  });
+  intxList.forEach(intx => ['NB','SB'].forEach(dir => {
+    const a = intx.approaches[dir];
+    const tot = (a.left||0)+(a.thru||0)+(a.right||0);
+    if (tot>0 && a.right/tot>0.6 && a.right>20){
+      cmBody += `<div class="insight"><b>${intx.name} ${dir} approach:</b> ${(a.right/tot*100).toFixed(0)}% right-turn (${a.right}/${tot} veh/hr). Channelization or dedicated right-turn lane warranted; conversion to right-in/right-out has low operational impact.</div>`;
+    }
+  }));
+  if (!cmBody) cmBody = '<div class="insight">No specific countermeasure suitability flags triggered.</div>';
+  html += section('Countermeasure Suitability', '', cmBody, false);
+
+  // DATA QUALITY
+  let dqBody = '';
+  intxList.forEach(intx => {
+    if (intx.cv > 0.10){
+      dqBody += `<div class="insight bad"><b>${intx.name}:</b> Day-to-day CV = ${(intx.cv*100).toFixed(1)}% (range ${intx.totals_range[0]}–${intx.totals_range[1]} veh/hr). Review for atypical conditions (school events, weather, incidents, partial-day counts) before using average values for design.</div>`;
+    } else if (intx.days >= 2){
+      dqBody += `<div class="insight"><b>${intx.name}:</b> Counts consistent across days (CV = ${(intx.cv*100).toFixed(1)}%). Data reliable for operational analysis.</div>`;
+    }
+  });
+  intxList.forEach(intx => {
+    const ped = intx.files[0].peds||{};
+    const totPed = (ped.south||0)+(ped.north||0)+(ped.west||0)+(ped.east||0);
+    if (totPed>=10){
+      dqBody += `<div class="insight warn"><b>${intx.name}:</b> Pedestrian volume = ${totPed}/hour during peak. Evaluate crossing treatments (RRFB, refuge island, leading interval).</div>`;
+    }
+  });
+  html += section('Data Quality & Pedestrians', '', dqBody, false);
+
+  document.getElementById('v-insights').innerHTML = html;
+}
+
+function renderQC(){
+  let html = `<div class="page-title">QC &amp; Verification</div>
+  <div class="page-sub">Independent peak-hour computation cross-checked against published values · proves parser accuracy</div>`;
+  html += '<div class="notes"><b>How this works:</b> the tool independently computes the PM peak hour using a sliding 4-interval (1-hour) window over the all-vehicle time series, then compares to the published peak hour in each CSV. A perfect parser produces Δ = 0 and matching peak start times for every file.</div>';
+
+  let body = '<div class="table-wrap"><table><thead><tr><th>File</th><th>Source Folder</th><th>Intersection</th><th>Date</th><th>Pub. Start</th><th class="num">Pub. Total</th><th>Comp. Start</th><th class="num">Comp. Total</th><th class="num">Δ</th><th>Status</th></tr></thead><tbody>';
+  let okCount = 0;
+  FILES.forEach(f => {
+    let bestPM = {sum:0,start:''};
+    for (let i=0;i<f.series.length-3;i++){
+      const t = f.series[i].time;
+      const isPM = /PM/.test(t)||t.startsWith('12:');
+      if (!isPM) continue;
+      const s4 = (f.series[i].Total||0)+(f.series[i+1].Total||0)+(f.series[i+2].Total||0)+(f.series[i+3].Total||0);
+      if (s4>bestPM.sum) bestPM = {sum:s4, start:t};
+    }
+    const pubTotal = (f.peak_hour.NBEntering||0)+(f.peak_hour.SBEntering||0)+(f.peak_hour.EBEntering||0)+(f.peak_hour.WBEntering||0);
+    const diff = bestPM.sum-pubTotal;
+    const ok = Math.abs(diff)<=2;
+    const startMatch = bestPM.start===f.peak_start;
+    if (ok && startMatch) okCount++;
+    const status = (ok && startMatch)?'<span style="color:var(--good)">✓ MATCH</span>':
+                   (ok?'<span style="color:var(--warn)">⚠ time diff</span>':'<span style="color:var(--bad)">✗ MISMATCH</span>');
+    const folder = f.source_path ? f.source_path.split('/').slice(-2,-1)[0] || '' : '';
+    body += `<tr><td style="font-size:10px">${f.filename}</td>
+      <td style="font-size:10px;color:var(--mute)">${folder||'—'}</td>
+      <td>${f.intersection}</td><td>${f.date}</td><td>${f.peak_start}</td>
+      <td class="num">${fmtNum(pubTotal)}</td><td>${bestPM.start}</td>
+      <td class="num">${fmtNum(bestPM.sum)}</td>
+      <td class="num">${diff>=0?'+':''}${diff}</td><td>${status}</td></tr>`;
+  });
+  body += '</tbody></table></div>';
+
+  const pct = FILES.length ? (okCount/FILES.length*100).toFixed(1) : 0;
+  const summaryClass = okCount === FILES.length ? '' : 'bad';
+  html += `<div class="insight ${summaryClass}" style="margin-bottom:12px"><b>Validation result:</b> ${okCount} of ${FILES.length} file(s) match published peak hour exactly (Δ ≤ 2 veh/hr and matching start time) — <b>${pct}%</b> accuracy.</div>`;
+  html += section('Per-File Verification', `${FILES.length} files`, body, true);
+
+  const errFiles = FILES.filter(f=>f.errors.length);
+  if (errFiles.length){
+    let errBody = '';
+    errFiles.forEach(f => { errBody += `<div class="status err">${f.filename}: ${f.errors.join('; ')}</div>`; });
+    html += section('Parse Errors', `${errFiles.length} file(s)`, errBody, true);
+  }
+
+  document.getElementById('v-qc').innerHTML = html;
+}
+
+// =========================================================================
+// EXPORTS
+// =========================================================================
+function dl(filename, content, mime){
+  const blob = new Blob([content], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+
+// Convert time string like "6:00 AM" to minutes from midnight
+function timeToMinutes(t){
+  const m = (t||'').match(/(\d+):(\d+)\s+(AM|PM)/);
+  if (!m) return -1;
+  let h = parseInt(m[1]); const mn = parseInt(m[2]); const ap = m[3];
+  if (ap === 'PM' && h !== 12) h += 12;
+  if (ap === 'AM' && h === 12) h = 0;
+  return h*60 + mn;
+}
+
+// Time windows for peak periods (in minutes from midnight)
+// Window means: 1-hour peak must FIT INSIDE the window — interval start in [winStart, winEnd - 60]
+const PEAK_WINDOWS = {
+  AM:     { label:'AM Peak (6:00–9:00 AM)',     start: 6*60,  end: 9*60  },
+  Midday: { label:'Midday Peak (9:00 AM–3:00 PM)', start: 9*60,  end: 15*60 },
+  PM:     { label:'PM Peak (3:00–6:00 PM)',     start: 15*60, end: 18*60 }
+};
+
+// For a single file's time series, find the peak 1-hour (4 consecutive 15-min intervals)
+// within a window. Returns { sum, start, movements } or null if no data.
+function findPeakInWindow(series, windowKey){
+  const win = PEAK_WINDOWS[windowKey];
+  const lastValidStart = win.end - 60;  // last interval-start that keeps the 1-hr window within bounds
+  const movementCols = ['NB Left','NB Thru','NB Right','SB Left','SB Thru','SB Right',
+                        'EB Left','EB Thru','EB Right','WB Left','WB Thru','WB Right'];
+  let best = { sum: -1, start: '', idx: -1, movements: null };
+
+  for (let i = 0; i < series.length - 3; i++){
+    const t = series[i].time;
+    const m = timeToMinutes(t);
+    if (m < win.start || m > lastValidStart) continue;
+    const s = (series[i].Total||0) + (series[i+1].Total||0) + (series[i+2].Total||0) + (series[i+3].Total||0);
+    if (s > best.sum){
+      const mv = {};
+      movementCols.forEach(c => {
+        mv[c] = (series[i][c]||0) + (series[i+1][c]||0) + (series[i+2][c]||0) + (series[i+3][c]||0);
+      });
+      best = { sum: s, start: t, idx: i, movements: mv };
+    }
+  }
+  return best.sum >= 0 ? best : null;
+}
+
+// Compute a per-day peak for each file in the intersection, then average across days.
+// Returns { avg_movements, avg_total, days_with_data, peak_starts }
+function intersectionWindowSummary(intx, windowKey){
+  const movementCols = ['NB Left','NB Thru','NB Right','SB Left','SB Thru','SB Right',
+                        'EB Left','EB Thru','EB Right','WB Left','WB Thru','WB Right'];
+  const sums = {}; movementCols.forEach(c => { sums[c] = 0; });
+  let totalSum = 0;
+  const peakStarts = [];
+  let daysWithData = 0;
+
+  intx.files.forEach(f => {
+    const p = findPeakInWindow(f.series, windowKey);
+    if (!p) return;
+    daysWithData++;
+    totalSum += p.sum;
+    peakStarts.push(p.start);
+    movementCols.forEach(c => { sums[c] += p.movements[c] || 0; });
+  });
+
+  if (daysWithData === 0) return null;
+  const avg = {};
+  movementCols.forEach(c => { avg[c] = Math.round(sums[c] / daysWithData); });
+  return {
+    avg_movements: avg,
+    avg_total: Math.round(totalSum / daysWithData),
+    days_with_data: daysWithData,
+    peak_starts: peakStarts
+  };
+}
+
+// Build a peak-period consolidated CSV for the given window
+function buildPeriodCSV(windowKey){
+  const win = PEAK_WINDOWS[windowKey];
+  const intxList = Object.values(INTERSECTIONS).sort((a,b) => {
+    // Sort by minor-st LT in this window if computed, else by name
+    const sa = intersectionWindowSummary(a, windowKey);
+    const sb = intersectionWindowSummary(b, windowKey);
+    const lta = sa ? (sa.avg_movements['NB Left'] + sa.avg_movements['SB Left']) : -1;
+    const ltb = sb ? (sb.avg_movements['NB Left'] + sb.avg_movements['SB Left']) : -1;
+    return ltb - lta;
+  });
+
+  let csv = `# ${win.label} — peak 1-hour within window, averaged across all count days at each intersection\n`;
+  csv += `# Window definition: 1-hour peak must start within ${formatMin(win.start)}–${formatMin(win.end - 60)} (so it ends by ${formatMin(win.end)})\n`;
+  csv += `# Generated by TMC Aggregator from ${FILES.length} CSV file(s)\n`;
+  csv += 'Rank,Intersection,Latitude,Longitude,Days_Counted,Days_With_Peak,Peak_Starts_Per_Day,';
+  csv += 'NB_Left,NB_Thru,NB_Right,NB_Entering,SB_Left,SB_Thru,SB_Right,SB_Entering,';
+  csv += 'EB_Left,EB_Thru,EB_Right,EB_Entering,WB_Left,WB_Thru,WB_Right,WB_Entering,';
+  csv += 'Minor_Street_LT,Major_Street_Thru,Total_Entering\n';
+
+  let rank = 0;
+  intxList.forEach(intx => {
+    const s = intersectionWindowSummary(intx, windowKey);
+    if (!s) return;
+    rank++;
+    const mv = s.avg_movements;
+    const NBe = mv['NB Left'] + mv['NB Thru'] + mv['NB Right'];
+    const SBe = mv['SB Left'] + mv['SB Thru'] + mv['SB Right'];
+    const EBe = mv['EB Left'] + mv['EB Thru'] + mv['EB Right'];
+    const WBe = mv['WB Left'] + mv['WB Thru'] + mv['WB Right'];
+    const minorLT = mv['NB Left'] + mv['SB Left'];
+    const majorThru = mv['EB Thru'] + mv['WB Thru'];
+    const total = s.avg_total;
+    csv += [
+      rank,
+      `"${intx.name}"`,
+      intx.lat || '',
+      intx.lng || '',
+      intx.days,
+      s.days_with_data,
+      `"${s.peak_starts.join('; ')}"`,
+      mv['NB Left'], mv['NB Thru'], mv['NB Right'], NBe,
+      mv['SB Left'], mv['SB Thru'], mv['SB Right'], SBe,
+      mv['EB Left'], mv['EB Thru'], mv['EB Right'], EBe,
+      mv['WB Left'], mv['WB Thru'], mv['WB Right'], WBe,
+      minorLT, majorThru, total
+    ].join(',') + '\n';
+  });
+  return csv;
+}
+
+function formatMin(m){
+  let h = Math.floor(m/60), mn = m%60;
+  const ap = h >= 12 ? 'PM' : 'AM';
+  if (h === 0) h = 12;
+  else if (h > 12) h -= 12;
+  return `${h}:${String(mn).padStart(2,'0')} ${ap}`;
+}
+
+function exportAmCSV(){    dl('TMC_AM_Peak_6-9AM.csv',      buildPeriodCSV('AM'),     'text/csv'); }
+function exportMidCSV(){   dl('TMC_Midday_Peak_9AM-3PM.csv', buildPeriodCSV('Midday'), 'text/csv'); }
+function exportPmCSV(){    dl('TMC_PM_Peak_3-6PM.csv',       buildPeriodCSV('PM'),     'text/csv'); }
+
+// Raw time series CSV — every 15-min interval, every file, every movement
+function exportRawCSV(){
+  let csv = '# Raw 15-minute time series — every interval from every count file\n';
+  csv += `# Generated by TMC Aggregator from ${FILES.length} CSV file(s) across ${Object.keys(INTERSECTIONS).length} intersection(s)\n`;
+  csv += 'QC_Job,Source_Folder,Intersection,Date,Time_Period,';
+  csv += 'NB_Left,NB_Thru,NB_Right,NB_UTurn,NB_RTOR,';
+  csv += 'SB_Left,SB_Thru,SB_Right,SB_UTurn,SB_RTOR,';
+  csv += 'EB_Left,EB_Thru,EB_Right,EB_UTurn,EB_RTOR,';
+  csv += 'WB_Left,WB_Thru,WB_Right,WB_UTurn,WB_RTOR,Total_Volume,Hourly_Total\n';
+
+  FILES.forEach(f => {
+    const folder = f.source_path ? f.source_path.split('/').slice(-2,-1)[0] || '' : '';
+    f.series.forEach(s => {
+      csv += [
+        f.qc_job,
+        `"${folder}"`,
+        `"${f.intersection}"`,
+        f.date,
+        `"${s.time}"`,
+        s['NB Left']||0,    s['NB Thru']||0, s['NB Right']||0, s['NB U-Turn']||0, s['NB RTOR']||0,
+        s['SB Left']||0,    s['SB Thru']||0, s['SB Right']||0, s['SB U-Turn']||0, s['SB RTOR']||0,
+        s['EB Left']||0,    s['EB Thru']||0, s['EB Right']||0, s['EB U-Turn']||0, s['EB RTOR']||0,
+        s['WB Left']||0,    s['WB Thru']||0, s['WB Right']||0, s['WB U-Turn']||0, s['WB RTOR']||0,
+        s['Total']||0,
+        s['Hourly Totals']||0
+      ].join(',') + '\n';
+    });
+  });
+  dl('TMC_Raw_TimeSeries.csv', csv, 'text/csv');
+}
+
+function exportPDF(){
+  document.getElementById('pcCorridorBig').textContent = CORRIDOR_NAME || '—';
+  document.getElementById('pcFiles').textContent = FILES.length;
+  document.getElementById('pcInts').textContent = Object.keys(INTERSECTIONS).length;
+  document.getElementById('pcDays').textContent = FILES.length;
+  document.getElementById('pcDate').textContent = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  // Force every view + every section open for printing
+  APP.querySelectorAll('.section').forEach(s => s.classList.add('open'));
+  APP.querySelectorAll('.tmc-view').forEach(v => v.classList.add('active'));
+  setTimeout(() => {
+    window.print();
+    // After print, restore: only the current view should remain active
+    setTimeout(() => {
+      APP.querySelectorAll('.tmc-view').forEach(v => v.classList.remove('active'));
+      document.getElementById('v-'+CURRENT_VIEW).classList.add('active');
+    }, 200);
+  }, 100);
+}
+
+// =========================================================================
+// INTAKE
+// =========================================================================
+function walkEntry(entry, path){
+  return new Promise(resolve => {
+    if (entry.isFile){
+      entry.file(file => {
+        file._fullPath = path + '/' + file.name;
+        resolve([file]);
+      }, () => resolve([]));
+    } else if (entry.isDirectory){
+      const reader = entry.createReader();
+      const allFiles = [];
+      function readBatch(){
+        reader.readEntries(async entries => {
+          if (!entries.length){ resolve(allFiles); return; }
+          for (const e of entries){
+            const sub = await walkEntry(e, path + '/' + entry.name);
+            allFiles.push(...sub);
+          }
+          readBatch();
+        }, () => resolve(allFiles));
+      }
+      readBatch();
+    } else resolve([]);
+  });
+}
+
+async function handleDropItems(items){
+  const all = [];
+  const promises = [];
+  for (const it of items){
+    if (it.kind === 'file'){
+      const entry = it.webkitGetAsEntry ? it.webkitGetAsEntry() : null;
+      if (entry){
+        promises.push(walkEntry(entry, ''));
+      } else {
+        const f = it.getAsFile(); if (f) all.push(f);
+      }
+    }
+  }
+  const results = await Promise.all(promises);
+  results.forEach(arr => all.push(...arr));
+  processFiles(all);
+}
+
+function processFiles(fileList){
+  const allFiles = Array.from(fileList);
+  const csvFiles = allFiles.filter(f=>f.name.toLowerCase().endsWith('.csv'));
+  const ignoredCount = allFiles.length - csvFiles.length;
+  const ignoredByExt = {};
+  allFiles.forEach(f => {
+    if (f.name.toLowerCase().endsWith('.csv')) return;
+    const ext = (f.name.split('.').pop() || 'no-ext').toLowerCase();
+    ignoredByExt[ext] = (ignoredByExt[ext]||0) + 1;
+  });
+  LAST_LOAD = { total: allFiles.length, csv: csvFiles.length, ignored: ignoredCount, breakdown: ignoredByExt };
+
+  if (!csvFiles.length){
+    setStatus(`No CSV files found in selection (${allFiles.length} non-CSV file${allFiles.length===1?'':'s'} ignored).`, true);
+    return;
+  }
+  UPLOAD_TOTAL = csvFiles.length; UPLOAD_DONE = 0;
+  showProgress();
+  setStatus(`Reading first CSV to detect format…`);
+
+  // STEP 1: Peek the first CSV to detect format
+  const firstReader = new FileReader();
+  firstReader.onload = e => {
+    const firstText = e.target.result;
+    const firstRows = parseCSVText(firstText);
+    const isQC = detectQCFormat(firstRows);
+
+    if (isQC){
+      // Standard QC path — auto-process all files silently
+      processCSVsAsQC(csvFiles);
+    } else {
+      // Non-QC format — show mapping UI on first CSV, then re-use mapping for all
+      hideProgress();
+      setStatus(`<b>Non-standard CSV format detected.</b> Please map the columns to continue.`, false, false);
+      showMappingUI(csvFiles[0].name, firstRows, (mapping) => {
+        // User confirmed mapping → process all files with it
+        showProgress();
+        setStatus(`Reading ${csvFiles.length} CSV file(s) with custom mapping…`);
+        processCSVsAsGeneric(csvFiles, mapping);
+      });
+    }
+  };
+  firstReader.onerror = () => {
+    setStatus('Could not read first CSV file.', true);
+    hideProgress();
+  };
+  firstReader.readAsText(csvFiles[0]);
+}
+
+// Process all CSVs assuming standard Quality Counts format
+function processCSVsAsQC(csvFiles){
+  setStatus(`Reading ${csvFiles.length} CSV file(s) (Quality Counts format)…`);
+  let loaded = 0;
+  csvFiles.forEach(f => {
+    const r = new FileReader();
+    const srcPath = f._fullPath || f.webkitRelativePath || f.name;
+    r.onload = e => {
+      try {
+        const parsed = parseTMC(f.name, e.target.result, srcPath);
+        FILES.push(parsed);
+      } catch (err){
+        FILES.push({filename:f.name, source_path:srcPath, errors:['Parse exception: '+err.message], series:[], peak_hour:{}, format:'qc'});
+      }
+      loaded++; UPLOAD_DONE++; updateProgress();
+      if (loaded===csvFiles.length) finalize();
+    };
+    r.onerror = () => { loaded++; UPLOAD_DONE++; updateProgress(); if (loaded===csvFiles.length) finalize(); };
+    r.readAsText(f);
+  });
+}
+
+// Process all CSVs using user-supplied column mapping
+function processCSVsAsGeneric(csvFiles, mapping){
+  UPLOAD_TOTAL = csvFiles.length; UPLOAD_DONE = 0;
+  let loaded = 0;
+  csvFiles.forEach(f => {
+    const r = new FileReader();
+    const srcPath = f._fullPath || f.webkitRelativePath || f.name;
+    r.onload = e => {
+      try {
+        const parsed = parseGenericFlat(f.name, e.target.result, srcPath, mapping);
+        FILES.push(parsed);
+      } catch (err){
+        FILES.push({filename:f.name, source_path:srcPath, errors:['Parse exception: '+err.message], series:[], peak_hour:{}, format:'generic'});
+      }
+      loaded++; UPLOAD_DONE++; updateProgress();
+      if (loaded===csvFiles.length) finalize();
+    };
+    r.onerror = () => { loaded++; UPLOAD_DONE++; updateProgress(); if (loaded===csvFiles.length) finalize(); };
+    r.readAsText(f);
+  });
+}
+
+function showProgress(){
+  document.getElementById('uprog').style.display = 'block';
+  updateProgress();
+}
+function updateProgress(){
+  const pct = UPLOAD_TOTAL ? Math.round(UPLOAD_DONE/UPLOAD_TOTAL*100) : 0;
+  document.getElementById('uprog').innerHTML = `Loading CSVs: <span class="pct">${pct}%</span><br><span style="color:var(--mute);font-size:10px">${UPLOAD_DONE} of ${UPLOAD_TOTAL} files parsed</span>`;
+}
+function hideProgress(){ document.getElementById('uprog').style.display = 'none'; }
+
+function finalize(){
+  aggregate();
+  hideProgress();
+  document.getElementById('headerTitle').innerHTML = `<span class="accent">${CORRIDOR_NAME||'Corridor'}</span> · ${FILES.length} CSV files · ${Object.keys(INTERSECTIONS).length} intersections`;
+
+  // Format detection summary
+  const formats = {};
+  FILES.forEach(f => { const fmt = f.format || 'qc'; formats[fmt] = (formats[fmt]||0) + 1; });
+  const fmtParts = Object.entries(formats).map(([k,n]) => {
+    if (k === 'qc') return `${n} Quality Counts format`;
+    if (k === 'generic') return `${n} custom-mapped format`;
+    return `${n} ${k}`;
+  });
+  let msg = `<b>✓ Loaded ${FILES.length} CSV file(s)</b> across ${Object.keys(INTERSECTIONS).length} intersection(s)${CORRIDOR_NAME?' on '+CORRIDOR_NAME:''}.<br>Format: ${fmtParts.join(', ')}.`;
+  if (LAST_LOAD.ignored > 0){
+    const parts = Object.entries(LAST_LOAD.breakdown).sort((a,b)=>b[1]-a[1]).map(([ext,n]) => `${n} .${ext}`);
+    msg += `<br>Scanned ${LAST_LOAD.total} item${LAST_LOAD.total===1?'':'s'} total · ignored ${LAST_LOAD.ignored} non-CSV file${LAST_LOAD.ignored===1?'':'s'} (${parts.join(', ')}).`;
+  }
+  setStatus(msg, false, true);
+
+  ['dlAm','dlMid','dlPm','dlRaw','dlPdf','clr'].forEach(id => document.getElementById(id).disabled = false);
+  document.querySelectorAll('#tmcTabs .tmc-tab').forEach(b => b.disabled = false);
+
+  renderOverview(); renderIntersections(); renderMovements(); renderHeatmap(); renderQC(); renderInsights();
+  switchView('overview');
+}
+
+function setStatus(msg, err, ok){
+  const s = document.getElementById('status');
+  s.style.display = 'block';
+  s.innerHTML = msg;
+  s.className = 'status' + (err?' err':(ok?' ok':''));
+}
+
+function switchView(v){
+  CURRENT_VIEW = v;
+  document.querySelectorAll('#tmcTabs .tmc-tab').forEach(b => b.classList.toggle('active', b.dataset.view===v));
+  APP.querySelectorAll('.tmc-view').forEach(d => d.classList.toggle('active', d.id==='v-'+v));
+}
+
+// =========================================================================
+// INIT
+// =========================================================================
+const dz = document.getElementById('dz'), fi = document.getElementById('fi'), fdir = document.getElementById('fdir');
+fi.addEventListener('change', e => processFiles(e.target.files));
+fdir.addEventListener('change', e => {
+  processFiles(e.target.files);
+  e.target.value = '';
+});
+['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
+dz.addEventListener('drop', e => {
+  e.preventDefault();
+  if (e.dataTransfer.items && e.dataTransfer.items[0]?.webkitGetAsEntry){
+    handleDropItems(e.dataTransfer.items);
+  } else if (e.dataTransfer.files.length){
+    processFiles(e.dataTransfer.files);
+  }
+});
+['dragenter','dragover'].forEach(ev => window.addEventListener(ev, e => { e.preventDefault(); }));
+window.addEventListener('drop', e => {
+  e.preventDefault();
+  if (e.dataTransfer.items && e.dataTransfer.items[0]?.webkitGetAsEntry){
+    handleDropItems(e.dataTransfer.items);
+  } else if (e.dataTransfer.files.length){
+    processFiles(e.dataTransfer.files);
+  }
+});
+
+document.getElementById('clr').onclick = () => {
+  FILES = []; INTERSECTIONS = {}; CORRIDOR_NAME = '';
+  document.getElementById('status').style.display = 'none';
+  APP.querySelectorAll('.tmc-view').forEach(v => { if (v.id !== 'v-input') v.innerHTML = ''; });
+  ['dlAm','dlMid','dlPm','dlRaw','dlPdf','clr'].forEach(id => document.getElementById(id).disabled = true);
+  document.querySelectorAll('#tmcTabs .tmc-tab').forEach(b => {
+    if (b.dataset.view !== 'input') b.disabled = true;
+  });
+  document.getElementById('headerTitle').textContent = 'Corridor turning movement count review';
+  switchView('input');
+};
+
+document.getElementById('dlAm').onclick = exportAmCSV;
+document.getElementById('dlMid').onclick = exportMidCSV;
+document.getElementById('dlPm').onclick = exportPmCSV;
+document.getElementById('dlRaw').onclick = exportRawCSV;
+document.getElementById('dlPdf').onclick = exportPDF;
+document.querySelectorAll('#tmcTabs .tmc-tab').forEach(b => b.onclick = () => { if (!b.disabled) switchView(b.dataset.view); });
+
+
+})();
 </script>
 </body>
 </html>
